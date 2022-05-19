@@ -25,7 +25,7 @@ class DigraphTest {
     @ParameterizedTest
     @CsvSource(
             {
-                    "A-B-C, 9", "A-D, 5", "A-D-C, 13", "A-E-B-C-D, 22", "A-E-D, -1"
+                    "A-B-C, 9", "A-D, 5", "A-D-C, 13", "A-E-B-C-D, 22", "A-E-D, -1", "A-Z, -1", ", -2", " , -2"
             }
     )
     void getLatency(String pathInfo, int expectLatency) {
