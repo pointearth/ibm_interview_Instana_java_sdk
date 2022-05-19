@@ -2,6 +2,7 @@ package instana;
 
 public class InstanaApplication {
     public static void main(String[] args) {
-        System.out.println("hello word!");
+        Digraph digraph =new Digraph(args[1]);
+        digraph.getLatency("A-B-C");
     }
 }
