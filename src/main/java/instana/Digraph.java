@@ -7,10 +7,15 @@ public class Digraph {
     private static final String PATH_SEPARATOR = "-";
     private Map<String, Node> nodes;
 
+    /***
+     * Construct Directed Graph with edges
+     * @param edgesInfo
+     */
     public Digraph(String edgesInfo) {
         nodes = new HashMap<>();
         List<Map.Entry<String, Node>> list = ParserInput(edgesInfo);
         if (null == list) {
+            // log
             return;
         }
         for (Map.Entry<String, Node> entry : list) {
@@ -32,15 +37,22 @@ public class Digraph {
         }
         List<Map.Entry<String, Node>> list = new ArrayList<>();
         for (int i = 0; i < edges.length; i++) {
-            Map.Entry<String, Node> entry = parserNode(edges[i]);
+            Map.Entry<String, Node> entry = parseNodes(edges[i].trim());
             if (null != entry) {
                 list.add(entry);
+            } else {
+                return null;
             }
         }
         return list;
     }
 
-    private Map.Entry<String, Node> parserNode(String edge) {
+    /**
+     * parse String into nodes
+     * @param edge: "AD5"
+     * @return
+     */
+    private Map.Entry<String, Node> parseNodes(String edge) {
         try {
             String parentNodeName = edge.substring(0, 1);
             String nodeName = edge.substring(1, 2);
@@ -53,6 +65,69 @@ public class Digraph {
         }
     }
 
+    /**
+     * get the number of traces from service startNodeName to service endNodeName with maxHops limitation
+     * @param starNodeName start service name
+     * @param endNodeName end service name
+     * @param maxHops limitation of max hops
+     * @return
+     */
+    public int getTraceNumberInHops(String starNodeName, String endNodeName, int maxHops) {
+        if (!nodes.containsKey(starNodeName)) {
+            return 0;
+        }
+        Node startNode = nodes.get(starNodeName);
+        String path = starNodeName;
+        int traceNumber = bFSGetTraceNumberWithHops(startNode, endNodeName,false, maxHops, path);
+        return traceNumber;
+    }
+    /**
+     * get the number of traces from service startNodeName to service endNodeName equal the expected Hops
+     * @param starNodeName start service name
+     * @param endNodeName end service name
+     * @param exactlyHops expect number of hops
+     * @return
+     */
+    public int getTraceNumberEqualHops(String starNodeName, String endNodeName, int exactlyHops) {
+        if (!nodes.containsKey(starNodeName)) {
+            return 0;
+        }
+        Node startNode = nodes.get(starNodeName);
+        String path = starNodeName;
+        int traceNumber = bFSGetTraceNumberWithHops(startNode, endNodeName,true, exactlyHops, path);
+        return traceNumber;
+    }
+
+    /**
+     * recursive BSF method to
+     * @param startNode   start service
+     * @param endNodeName end service name
+     * @bExactlyHops is exactly hops, or maxHops
+     * @param restHops rest number of hops
+     * @param path help to show path
+     * @return number of trace
+     */
+    private int bFSGetTraceNumberWithHops(Node startNode, String endNodeName, boolean bExactlyHops, int restHops, String path) {
+        System.out.println("current path:" + path);
+        if (restHops < 1) {
+            System.out.println("---reach limitation: "+ path);
+            return 0;
+        }
+        int traceNumber = 0;
+        if (startNode.children.containsKey(endNodeName)) {
+            if ((bExactlyHops && restHops == 1) || !bExactlyHops) {
+                traceNumber = 1;
+                System.out.println("===success " + path + "-" + endNodeName);
+            }
+        }
+        for (Node subNode : startNode.children.values()) {
+            if (nodes.containsKey(subNode.name)) {
+                Node curStartNode = nodes.get(subNode.name);
+                traceNumber += bFSGetTraceNumberWithHops(curStartNode, endNodeName, bExactlyHops,restHops - 1, path+"-"+subNode.name);
+            }
+        }
+        return traceNumber;
+    }
 
     /***
      *
@@ -73,14 +148,16 @@ public class Digraph {
 
         int latency = 0;
         for (int i = 1; i < paths.length; i++) {
-            if (!nodes.containsKey(paths[i - 1])) {
+            String preNodeName = paths[i].trim();
+            String nodeName = paths[i - 1].trim();
+            if (!nodes.containsKey(nodeName)) {
                 return -1;
             }
-            Node startNode = nodes.get(paths[i - 1]);
-            if (!startNode.children.containsKey(paths[i])) {
+            Node startNode = nodes.get(nodeName);
+            if (!startNode.children.containsKey(preNodeName)) {
                 return -1;
             } else {
-                Node endNode = startNode.children.get(paths[i]);
+                Node endNode = startNode.children.get(preNodeName);
                 latency += endNode.weight;
             }
         }
