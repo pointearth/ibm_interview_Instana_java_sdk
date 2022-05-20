@@ -49,7 +49,7 @@ public class Digraph {
 
     /**
      * parse String into nodes
-     * @param edge: "AD5"
+     * @param edge: like "AD5"
      * @return
      */
     private Map.Entry<String, Node> parseNodes(String edge) {
@@ -63,6 +63,41 @@ public class Digraph {
             // log
             return null;
         }
+    }
+
+    /***
+     *
+     * @param pathInfo: nodes in the trace, such as A-B-C
+     * @return
+     *  -2: pathInfo' format error
+     *  -1: no such trace
+     *  >=0: average Latencies
+     */
+    public int getLatency(String pathInfo) {
+        if (null == pathInfo || pathInfo.isEmpty()) {
+            return -2;
+        }
+        String[] paths = pathInfo.split(PATH_SEPARATOR);
+        if (null == paths || 0 == paths.length) {
+            return -2;
+        }
+
+        int latency = 0;
+        for (int i = 1; i < paths.length; i++) {
+            String preNodeName = paths[i].trim();
+            String nodeName = paths[i - 1].trim();
+            if (!nodes.containsKey(nodeName)) {
+                return -1;
+            }
+            Node startNode = nodes.get(nodeName);
+            if (!startNode.children.containsKey(preNodeName)) {
+                return -1;
+            } else {
+                Node endNode = startNode.children.get(preNodeName);
+                latency += endNode.weight;
+            }
+        }
+        return latency;
     }
 
     /**
@@ -128,39 +163,7 @@ public class Digraph {
         }
         return traceNumber;
     }
-
-    /***
-     *
-     * @param pathInfo: nodes in the trace, such as A-B-C
-     * @return
-     *  -2: pathInfo' format error
-     *  -1: no such trace
-     *  >=0: average Latencies
-     */
-    public int getLatency(String pathInfo) {
-        if (null == pathInfo || pathInfo.isEmpty()) {
-            return -2;
-        }
-        String[] paths = pathInfo.split(PATH_SEPARATOR);
-        if (null == paths || 0 == paths.length) {
-            return -2;
-        }
-
-        int latency = 0;
-        for (int i = 1; i < paths.length; i++) {
-            String preNodeName = paths[i].trim();
-            String nodeName = paths[i - 1].trim();
-            if (!nodes.containsKey(nodeName)) {
-                return -1;
-            }
-            Node startNode = nodes.get(nodeName);
-            if (!startNode.children.containsKey(preNodeName)) {
-                return -1;
-            } else {
-                Node endNode = startNode.children.get(preNodeName);
-                latency += endNode.weight;
-            }
-        }
-        return latency;
+    public int dijkstraGetMinDistance(String startNodeName, String endNodeName ) {
+        return -1;
     }
 }

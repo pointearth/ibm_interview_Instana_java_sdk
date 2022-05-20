@@ -35,4 +35,11 @@ class DigraphTest {
         int traceNumber = digraph.getTraceNumberEqualHops(startNodeName, endNodeName, exactlyHops);
         assertEquals(expectTraceNumber, traceNumber);
     }
+
+    @ParameterizedTest
+    @CsvSource({"A, C, 9", "B, B, 9"})
+    void dijkstraGetMinDistance(String startNodeName, String endNodeName, int expectMinDistance ) {
+        int minDistance = digraph.dijkstraGetMinDistance(startNodeName,endNodeName);
+        assertEquals(expectMinDistance, minDistance);
+    }
 }
