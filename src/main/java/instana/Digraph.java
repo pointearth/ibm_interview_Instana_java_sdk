@@ -2,10 +2,13 @@ package instana;
 
 import java.util.*;
 
+/**
+ * @author Simon
+ */
 public class Digraph {
-    private static final String INPUT_SEPARATOR = ",";
-    private static final String PATH_SEPARATOR = "-";
-    private Map<String, Node> nodes;
+
+
+    private Map<Character, AdjacencyListNode> nodes;
 
     /***
      * Construct Directed Graph with edges
@@ -13,55 +16,17 @@ public class Digraph {
      */
     public Digraph(String edgesInfo) {
         nodes = new HashMap<>();
-        List<Map.Entry<String, Node>> list = ParserInput(edgesInfo);
+        List<Vertex> list = CommonTools.parseInput(edgesInfo);
         if (null == list) {
             // log
             return;
         }
-        for (Map.Entry<String, Node> entry : list) {
-            if (!nodes.containsKey(entry.getKey())) {
-                nodes.put(entry.getKey(), new Node(entry.getKey(), 0));
+        for (Vertex vertex : list) {
+            if (!nodes.containsKey(vertex.previous)) {
+                nodes.put(vertex.previous, new AdjacencyListNode(vertex.destination, 0));
             }
-            Node curNode = nodes.get(entry.getKey());
-            curNode.children.put(entry.getValue().name, entry.getValue());
-        }
-    }
-
-    private List<Map.Entry<String, Node>> ParserInput(String edgesInfo) {
-        if (null == edgesInfo || edgesInfo.isEmpty()) {
-            return null;
-        }
-        String[] edges = edgesInfo.split(INPUT_SEPARATOR);
-        if (null == edges || 0 == edges.length) {
-            return null;
-        }
-        List<Map.Entry<String, Node>> list = new ArrayList<>();
-        for (int i = 0; i < edges.length; i++) {
-            Map.Entry<String, Node> entry = parseNodes(edges[i].trim());
-            if (null != entry) {
-                list.add(entry);
-            } else {
-                return null;
-            }
-        }
-        return list;
-    }
-
-    /**
-     * parse String into nodes
-     * @param edge: like "AD5"
-     * @return
-     */
-    private Map.Entry<String, Node> parseNodes(String edge) {
-        try {
-            String parentNodeName = edge.substring(0, 1);
-            String nodeName = edge.substring(1, 2);
-            String weightStr = edge.substring(2, edge.length());
-            int weight = Integer.parseInt(weightStr);
-            return new AbstractMap.SimpleEntry<>(parentNodeName, new Node(nodeName, weight));
-        } catch (Exception ex) {
-            // log
-            return null;
+            AdjacencyListNode curNode = nodes.get(vertex.previous);
+            curNode.children.put(vertex.destination, vertex.weight);
         }
     }
 
@@ -74,27 +39,21 @@ public class Digraph {
      *  >=0: average Latencies
      */
     public int getLatency(String pathInfo) {
-        if (null == pathInfo || pathInfo.isEmpty()) {
-            return -2;
-        }
-        String[] paths = pathInfo.split(PATH_SEPARATOR);
-        if (null == paths || 0 == paths.length) {
-            return -2;
-        }
-
         int latency = 0;
-        for (int i = 1; i < paths.length; i++) {
-            String preNodeName = paths[i].trim();
-            String nodeName = paths[i - 1].trim();
-            if (!nodes.containsKey(nodeName)) {
+        Character[] pathNodes = CommonTools.parsePath(pathInfo);
+        if (null == pathNodes) {
+            return -2;
+        }
+        for (int i = 1; i < pathNodes.length; i++) {
+            if (!nodes.containsKey(pathNodes[i - 1])) {
                 return -1;
             }
-            Node startNode = nodes.get(nodeName);
-            if (!startNode.children.containsKey(preNodeName)) {
+            AdjacencyListNode startNode = nodes.get(pathNodes[i - 1]);
+            if (!startNode.children.containsKey(pathNodes[i])) {
                 return -1;
             } else {
-                Node endNode = startNode.children.get(preNodeName);
-                latency += endNode.weight;
+                Integer endNodeWight = startNode.children.get(pathNodes[i]);
+                latency += endNodeWight;
             }
         }
         return latency;
@@ -106,13 +65,18 @@ public class Digraph {
      * @param endNodeName end service name
      * @param maxHops limitation of max hops
      * @return
+     * -2: format error
+     * 0<=: trace number
      */
-    public int getTraceNumberInHops(String starNodeName, String endNodeName, int maxHops) {
+    public int getTraceNumberInHops(Character starNodeName, Character endNodeName, int maxHops) {
+        if (null == starNodeName || null == endNodeName) {
+            return -2;
+        }
         if (!nodes.containsKey(starNodeName)) {
             return 0;
         }
-        Node startNode = nodes.get(starNodeName);
-        String path = starNodeName;
+        AdjacencyListNode startNode = nodes.get(starNodeName);
+        String path = starNodeName.toString();
         int traceNumber = bFSGetTraceNumberWithHops(startNode, endNodeName,false, maxHops, path);
         return traceNumber;
     }
@@ -123,12 +87,12 @@ public class Digraph {
      * @param exactlyHops expect number of hops
      * @return
      */
-    public int getTraceNumberEqualHops(String starNodeName, String endNodeName, int exactlyHops) {
+    public int getTraceNumberEqualHops(Character starNodeName, Character endNodeName, int exactlyHops) {
         if (!nodes.containsKey(starNodeName)) {
             return 0;
         }
-        Node startNode = nodes.get(starNodeName);
-        String path = starNodeName;
+        AdjacencyListNode startNode = nodes.get(starNodeName);
+        String path = starNodeName.toString();
         int traceNumber = bFSGetTraceNumberWithHops(startNode, endNodeName,true, exactlyHops, path);
         return traceNumber;
     }
@@ -142,7 +106,7 @@ public class Digraph {
      * @param path help to show path
      * @return number of trace
      */
-    private int bFSGetTraceNumberWithHops(Node startNode, String endNodeName, boolean bExactlyHops, int restHops, String path) {
+    private int bFSGetTraceNumberWithHops(AdjacencyListNode startNode, Character endNodeName, boolean bExactlyHops, int restHops, String path) {
         System.out.println("current path:" + path);
         if (restHops < 1) {
             System.out.println("---reach limitation: "+ path);
@@ -155,15 +119,75 @@ public class Digraph {
                 System.out.println("===success " + path + "-" + endNodeName);
             }
         }
-        for (Node subNode : startNode.children.values()) {
-            if (nodes.containsKey(subNode.name)) {
-                Node curStartNode = nodes.get(subNode.name);
-                traceNumber += bFSGetTraceNumberWithHops(curStartNode, endNodeName, bExactlyHops,restHops - 1, path+"-"+subNode.name);
+        for (Character nodeName : startNode.children.keySet()) {
+            if (nodes.containsKey(nodeName)) {
+                AdjacencyListNode curStartNode = nodes.get(nodeName);
+                traceNumber += bFSGetTraceNumberWithHops(curStartNode, endNodeName, bExactlyHops,restHops - 1, path+"-"+nodeName);
             }
         }
         return traceNumber;
     }
-    public int dijkstraGetMinDistance(String startNodeName, String endNodeName ) {
+
+    /**
+     *
+     * @param source
+     * @param destination
+     * @return
+     * -2: input error
+     * -1: no such trace
+     * 0<=: shortest trace
+     */
+    public int dijkstraGetMinDistance(Character source, Character destination) {
+        if (null == source || null == destination
+                ||  !nodes.containsKey(source)
+                ||  !nodes.containsKey(destination) ) {
+            return -2;
+        }
+
+        int[] distances = new int[nodes.size()];
+        for (int i = 0; i < distances.length; i++) {
+            distances[i] = Integer.MAX_VALUE;
+        }
+
+        boolean[] visited = new boolean[nodes.size()];
+        for (int i = 0; i < visited.length; i++) {
+            visited[i] = false;
+        }
+
+        // for each vertex, save its previous vertex index(name)
+        int[] explores = new int[nodes.size()];
+        for (int i = 0; i < explores.length; i++) {
+            // -1 means the 'previous' is unknown yet
+            explores[i] = -1;
+        }
+
+//        Map<Character, Vertex> exploredVertices = new HashMap<>();
+
+        PriorityQueue<Vertex> queue = new PriorityQueue<>(Comparator.comparingInt(a -> a.weight));
+
+        distances[source - CommonTools.A] = 0;
+        queue.add(new Vertex(null, source,0));
+
+
+        while (!queue.isEmpty()) {
+            Vertex sVertex = queue.poll();
+            distances[sVertex.destination - CommonTools.A] = sVertex.weight;
+            explores[sVertex.destination - CommonTools.A] = sVertex.previous - CommonTools.A;
+            visited[sVertex.destination - CommonTools.A] = true;
+
+            if (sVertex.equals(destination)) {
+                break;
+            }
+            if (!nodes.containsKey(sVertex.destination)) {
+                return -1;
+            }
+            AdjacencyListNode node = nodes.get(sVertex.destination);
+
+//            for( AdjacencyListNode subNode : node.children.values()) {
+////                subNode.
+////                queue.offer( new Vertex())
+//            }
+        }
         return -1;
     }
 }
