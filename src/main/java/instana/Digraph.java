@@ -42,15 +42,15 @@ public class Digraph {
         int latency = 0;
         Character[] pathNodes = CommonTools.parsePath(pathInfo);
         if (null == pathNodes) {
-            return -2;
+            return ErrorCode.INPUT_ERROR;
         }
         for (int i = 1; i < pathNodes.length; i++) {
             if (!nodes.containsKey(pathNodes[i - 1])) {
-                return -1;
+                return ErrorCode.NOT_EXIST;
             }
             AdjacencyListNode startNode = nodes.get(pathNodes[i - 1]);
             if (!startNode.children.containsKey(pathNodes[i])) {
-                return -1;
+                return ErrorCode.NOT_EXIST;
             } else {
                 Integer endNodeWight = startNode.children.get(pathNodes[i]);
                 latency += endNodeWight;
@@ -70,7 +70,7 @@ public class Digraph {
      */
     public int getTraceNumberInHops(Character starNodeName, Character endNodeName, int maxHops) {
         if (null == starNodeName || null == endNodeName) {
-            return -2;
+            return ErrorCode.INPUT_ERROR;
         }
         if (!nodes.containsKey(starNodeName)) {
             return 0;
@@ -141,7 +141,7 @@ public class Digraph {
         if (null == source || null == destination
                 ||  !nodes.containsKey(source)
                 ||  !nodes.containsKey(destination) ) {
-            return -2;
+            return ErrorCode.INPUT_ERROR;
         }
 
         int[] distances = new int[nodes.size()];
@@ -158,28 +158,28 @@ public class Digraph {
         int[] explores = new int[nodes.size()];
         for (int i = 0; i < explores.length; i++) {
             // -1 means the 'previous' is unknown yet
-            explores[i] = -1;
+            explores[i] = ErrorCode.NOT_EXIST;
         }
 
 //        Map<Character, Vertex> exploredVertices = new HashMap<>();
 
         PriorityQueue<Vertex> queue = new PriorityQueue<>(Comparator.comparingInt(a -> a.weight));
 
-        distances[source - CommonTools.A] = 0;
+        distances[source - Const.A] = 0;
         queue.add(new Vertex(null, source,0));
 
 
         while (!queue.isEmpty()) {
             Vertex sVertex = queue.poll();
-            distances[sVertex.destination - CommonTools.A] = sVertex.weight;
-            explores[sVertex.destination - CommonTools.A] = sVertex.previous - CommonTools.A;
-            visited[sVertex.destination - CommonTools.A] = true;
+            distances[sVertex.destination - Const.A] = sVertex.weight;
+            explores[sVertex.destination - Const.A] = sVertex.previous - Const.A;
+            visited[sVertex.destination - Const.A] = true;
 
             if (sVertex.equals(destination)) {
                 break;
             }
             if (!nodes.containsKey(sVertex.destination)) {
-                return -1;
+                return ErrorCode.NOT_EXIST;
             }
             AdjacencyListNode node = nodes.get(sVertex.destination);
 
@@ -188,6 +188,6 @@ public class Digraph {
 ////                queue.offer( new Vertex())
 //            }
         }
-        return -1;
+        return ErrorCode.NOT_EXIST;
     }
 }

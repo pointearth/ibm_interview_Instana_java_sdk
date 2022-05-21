@@ -10,10 +10,6 @@ import java.util.List;
  * @author Simon
  */
 public class CommonTools {
-    public static final Character A = 'A';
-    public static final Character Z = 'Z';
-    private static final String PATH_SEPARATOR = "-";
-    private static final String INPUT_SEPARATOR = ",";
 
     /**
      * Parse pathInfo
@@ -27,7 +23,7 @@ public class CommonTools {
         if (null == pathInfo || pathInfo.isEmpty()) {
             return null;
         }
-        String[] paths = pathInfo.split(PATH_SEPARATOR);
+        String[] paths = pathInfo.split(Const.PATH_SEPARATOR);
         if (null == paths || 0 == paths.length) {
             return null;
         }
@@ -53,7 +49,7 @@ public class CommonTools {
         if (null == edgesInfo || edgesInfo.isEmpty()) {
             return null;
         }
-        String[] edges = edgesInfo.split(INPUT_SEPARATOR);
+        String[] edges = edgesInfo.split(Const.INPUT_SEPARATOR);
         if (null == edges || 0 == edges.length) {
             return null;
         }
@@ -102,7 +98,7 @@ public class CommonTools {
 
     private static boolean isValidNodeName(String nodeName) {
         return 1 == nodeName.trim().length()
-                && A <= nodeName.trim().charAt(0)
-                && nodeName.trim().charAt(0) <= Z;
+                && Const.A <= nodeName.trim().charAt(0)
+                && nodeName.trim().charAt(0) <= Const.Z;
     }
 }
