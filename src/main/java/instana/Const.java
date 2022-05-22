@@ -1,5 +1,8 @@
 package instana;
 
+/**
+ * @author Simon
+ */
 public class Const {
     public static final Character A = 'A';
     public static final Character Z = 'Z';

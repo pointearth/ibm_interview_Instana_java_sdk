@@ -2,6 +2,7 @@ package instana;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletionService;
 
 
 /**
@@ -40,6 +41,7 @@ public class CommonTools {
 
     /**
      * Parse Input graph into a vertex list
+     *
      * @param edgesInfo: input information to create the graph,
      *                   i.e: "AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"
      * @return a list presenting all the edges
@@ -67,6 +69,7 @@ public class CommonTools {
 
     /**
      * parse String into vertex
+     *
      * @param edge: like "AD5"
      * @return a vertex
      * null: input error
@@ -100,5 +103,24 @@ public class CommonTools {
         return 1 == nodeName.trim().length()
                 && Const.A <= nodeName.trim().charAt(0)
                 && nodeName.trim().charAt(0) <= Const.Z;
+    }
+
+    public static String getPathInfoFromArray(int[] explores, Character destination) {
+        if (0 == explores.length) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(destination);
+        int previousIndex = explores[destination - Const.A];
+        while (previousIndex != -1) {
+            String previousPath = String.format("%c-", (char) (previousIndex + Const.A));
+            sb.insert(0, previousPath);
+            // it is a loop, means reach the start node
+            if (previousIndex == destination - Const.A) {
+                break;
+            }
+            previousIndex = explores[previousIndex];
+        }
+        return sb.toString();
     }
 }

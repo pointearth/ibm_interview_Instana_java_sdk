@@ -11,12 +11,15 @@ import java.util.Map;
  */
 public class AdjacencyListNode {
     public Character name;
+    /**
+     * children means all destination nodes from the node which named as this.name
+     * Character: presents the destination node
+     * Integer: presents the distance between destination node and this.name node
+     */
     public Map<Character, Integer> children;
-    public int weight = 0;
 
-    public AdjacencyListNode(Character name, int weight) {
+    public AdjacencyListNode(Character name) {
         this.name = name;
-        this.weight = weight;
         children = new HashMap<>();
     }
 }

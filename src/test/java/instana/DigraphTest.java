@@ -22,7 +22,7 @@ class DigraphTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"C, C, 3, 2", "C, C, 2, 1","A, D, 3, 4"})
+    @CsvSource({"C, C, 3, 2", "C, C, 2, 1", "A, D, 3, 4"})
     void getTraceNumberInHops(Character startNodeName, Character endNodeName, int maxHops, int expectTraceNumber) {
         Digraph digraphLocal = new Digraph("AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7, DA6");
         int traceNumber = digraphLocal.getTraceNumberInHops(startNodeName, endNodeName, maxHops);
@@ -36,10 +36,10 @@ class DigraphTest {
         assertEquals(expectTraceNumber, traceNumber);
     }
 
-//    @ParameterizedTest
-//    @CsvSource({"A, C, 9", "B, B, 9"})
-//    void dijkstraGetMinDistance(String startNodeName, String endNodeName, int expectMinDistance ) {
-//        int minDistance = digraph.dijkstraGetMinDistance(startNodeName,endNodeName);
-//        assertEquals(expectMinDistance, minDistance);
-//    }
+    @ParameterizedTest
+    @CsvSource({"A, C, 9", "B,B,9"})
+    void dijkstraGetMinDistance(Character startNodeName, Character endNodeName, int expectMinDistance) {
+        int minDistance = digraph.dijkstraGetMinDistance(startNodeName, endNodeName);
+        assertEquals(expectMinDistance, minDistance);
+    }
 }

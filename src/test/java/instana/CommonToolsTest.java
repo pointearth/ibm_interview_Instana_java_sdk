@@ -1,9 +1,16 @@
 package instana;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,5 +62,20 @@ class CommonToolsTest {
             destination = vertex.destination;
         }
         assertEquals(expectDestination, destination);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getDataProvider")
+    void getPathInfoFromArray(int[] exploreInfo, Character destination, String expectPathInfo) {
+        String pathInfo = CommonTools.getPathInfoFromArray(exploreInfo, destination);
+        assertEquals(expectPathInfo, pathInfo);
+    }
+
+    static Stream<Arguments> getDataProvider() {
+        return Stream.of(
+                Arguments.of(new int[]{-1, 0, 1, 0, 2}, 'C', "A-B-C")
+                , Arguments.of(new int[]{0, 0, 1, 0, 2}, 'C', "")
+//                , Arguments.of(new int[]{-1, 0, 1, 0, 2}, "B-C-E-B")
+        );
     }
 }
