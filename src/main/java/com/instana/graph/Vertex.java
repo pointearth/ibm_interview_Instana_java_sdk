@@ -5,23 +5,23 @@ package com.instana.graph;
  * Description: a light version of Node, without children collection.
  * the class is used in dijkstra algorithm, in priority Queue, or temporary data.
  */
-public class Edge {
-    public Character previous;
+public class Vertex {
+    public Character source;
     public Character destination;
     public int weight;
 
-    public Edge() {
+    public Vertex() {
         weight = Integer.MAX_VALUE;
     }
 
-    public Edge(Character previous, Character destination, int weight) {
-        this.previous = previous;
+    public Vertex(Character previous, Character destination, int weight) {
+        this.source = previous;
         this.destination = destination;
         this.weight = weight;
     }
 
     @Override
     public String toString() {
-        return String.format("edge: %c%c%d", previous, destination, weight);
+        return String.format("vertex:%c%c%d", source, destination, weight);
     }
 }

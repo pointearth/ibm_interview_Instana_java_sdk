@@ -2,6 +2,7 @@ package com.instana.graph;
 
 import com.instana.common.Const4Test;
 import com.instana.common.Tools;
+import com.instana.exception.GraphException;
 import com.instana.exception.NotFoundException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,9 +10,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -66,7 +65,7 @@ class DigraphTest {
     void getInstance(Character source, Character destination, Optional<Integer> expectLatency) throws NotFoundException {
         Optional<Integer> instance = iGraph.getInstance(source, destination);
         instance.ifPresentOrElse(
-                curIntance -> assertEquals(expectLatency.get(), curIntance), () -> assertTrue(instance.isEmpty()));
+                realInstance -> assertEquals(expectLatency.get(), realInstance), () -> assertTrue(instance.isEmpty()));
     }
 
     static Stream<Arguments> getInstanceDataProvider() {
@@ -81,6 +80,14 @@ class DigraphTest {
     }
 
     @Test
+    @Order(5)
+    void getInstanceShouldThrowException() {
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            iGraph.getInstance('Z', 'B');
+        });
+    }
+
+    @Test
     void getTraceNumberInMaxHops() {
     }
 
@@ -88,8 +95,27 @@ class DigraphTest {
     void getTraceNumberExactlyHops() {
     }
 
-    @Test
-    void getShortestPath() {
+
+    //    void dijkstraGetMinDistance(Character startNodeName, Character endNodeName, int expectMinDistance) {
+    @ParameterizedTest
+    @Order(4)
+    @MethodSource("getShortestPathDataProvider")
+    void getShortestPath(Character startNodeName, Character endNodeName, Map.Entry<Integer,List<Character>> expectResult) throws NotFoundException, GraphException {
+        Optional<Map.Entry<Integer, List<Character>>> result = iGraph.getShortestPath(startNodeName, endNodeName);
+        result.ifPresentOrElse(
+                realResult -> {
+                    assertEquals(expectResult.getKey(), realResult.getKey());
+                    assertEquals(expectResult.getValue(), realResult.getValue());
+                    }, () -> {assertTrue(result.isEmpty());}
+        );
+    }
+
+    static Stream<Arguments> getShortestPathDataProvider() {
+        return Stream.of(
+                Arguments.of('A', 'C',new AbstractMap.SimpleEntry<Integer, List>(9, Arrays.asList('A', 'B', 'C'))),
+                Arguments.of('B', 'B',new AbstractMap.SimpleEntry<Integer, List>(9, Arrays.asList('B', 'C', 'E', 'B')))
+//               Arguments.of('E', 'D', new AbstractMap.SimpleEntry<Integer, List>(15, Arrays.asList('E', 'B', 'C', 'D')))
+        );
     }
 
     @Test

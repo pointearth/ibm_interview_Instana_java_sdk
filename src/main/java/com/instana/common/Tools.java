@@ -75,29 +75,29 @@ public class Tools {
     /**
      * parse String into edges
      *
-     * @param edge: like "AD5"
-     * @return a vertex
+     * @param edgeInfo: like "AD5"
+     * @return a edge
      * null: input error
      */
-    public Edge parseEdge(String edge) {
-        if (null == edge || edge.length() < 3) {
+    public Edge parseEdge(String edgeInfo) {
+        if (null == edgeInfo || edgeInfo.length() < 3) {
             return null;
         }
-        Edge vertex = new Edge();
+        Edge edge = new Edge();
         try {
-            if (isValidNodeName(edge.substring(0, 1))) {
-                vertex.previous = edge.charAt(0);
+            if (isValidNodeName(edgeInfo.substring(0, 1))) {
+                edge.previous = edgeInfo.charAt(0);
             } else {
                 return null;
             }
-            if (isValidNodeName(edge.substring(1, 2))) {
-                vertex.destination = edge.charAt(1);
+            if (isValidNodeName(edgeInfo.substring(1, 2))) {
+                edge.destination = edgeInfo.charAt(1);
             } else {
                 return null;
             }
-            String weightStr = edge.substring(2, edge.length());
-            vertex.weight = Integer.parseInt(weightStr);
-            return vertex;
+            String weightStr = edgeInfo.substring(2, edgeInfo.length());
+            edge.weight = Integer.parseInt(weightStr);
+            return edge;
         } catch (Exception ex) {
             // log
             return null;

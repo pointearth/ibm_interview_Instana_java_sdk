@@ -18,10 +18,10 @@ public class Digraph implements IGraph {
      */
     public Digraph() {
         tools = new Tools();
-        initData();
+        cleanData();
     }
     @Override
-    public void initData() {
+    public void cleanData() {
         nodes = new HashMap<>();
     }
     @Override
@@ -60,7 +60,7 @@ public class Digraph implements IGraph {
     @Override
     public void loadData(List<Edge> edgeList) throws NullPointerException {
         if (0 != nodes.size()) {
-            initData();
+            cleanData();
         }
         edgeList.forEach(edge -> {
             addEdge(edge);
@@ -174,7 +174,6 @@ public class Digraph implements IGraph {
     @Override
     public Optional<Map.Entry<Integer,List<Character>>> getShortestPath(Character source, Character destination)
             throws NotFoundException, GraphException {
-
         if (!nodes.containsKey(source) || !nodes.containsKey(destination)) {
             throw new NotFoundException("can't find the node in the graph");
         }
@@ -183,7 +182,7 @@ public class Digraph implements IGraph {
         for (int i = 0; i < distances.length; i++) {
             distances[i] = Integer.MAX_VALUE;
         }
-        // visited array presents whether the vertex is visited
+        // visited array presents whether the edge is visited
         boolean[] visited = new boolean[nodes.size()];
         for (int i = 0; i < visited.length; i++) {
             visited[i] = false;
@@ -196,42 +195,42 @@ public class Digraph implements IGraph {
             explores[i] = ErrorCode.NOT_EXIST.getValue();
         }
 
-        PriorityQueue<Edge> queue = new PriorityQueue<>(Comparator.comparingInt(a -> a.weight));
-        queue.add(new Edge(null, source, 0));
-        boolean isFirstVertex = true;
+        PriorityQueue<Vertex> queue = new PriorityQueue<>(Comparator.comparingInt(a -> a.weight));
+        queue.add(new Vertex(null, source, 0));
+        boolean isFirstEdge = true;
         while (!queue.isEmpty()) {
-            Edge minEdge = queue.poll();
+            Vertex minVertex = queue.poll();
             // ignore if it is already visited
-            if (visited[minEdge.destination - Const.A]) {
+            if (visited[minVertex.destination - Const.A]) {
                 continue;
             }
             // avoid source == destination
-            if (minEdge.destination.equals(destination) && visited[source - Const.A]) {
-                explores[destination - Const.A] = minEdge.previous - Const.A;
+            if (minVertex.destination.equals(destination) && visited[source - Const.A]) {
+                explores[destination - Const.A] = minVertex.source - Const.A;
                 break;
             }
             // the trace doesn't exist
-            if (!nodes.containsKey(minEdge.destination)) {
+            if (!nodes.containsKey(minVertex.destination)) {
                 throw new GraphException("can't find destination in priority queue");
             }
-            AdjacencyList node = nodes.get(minEdge.destination);
+            AdjacencyList node = nodes.get(minVertex.destination);
 
-            for (Map.Entry<Character, Integer> subVertex : node.children.entrySet()) {
-                Character subDestination = subVertex.getKey();
-                Integer subDistance = subVertex.getValue();
+            for (Map.Entry<Character, Integer> subEdge : node.children.entrySet()) {
+                Character subDestination = subEdge.getKey();
+                Integer subDistance = subEdge.getValue();
                 // update distances array
-                if (!visited[subDestination - Const.A] && subDistance + minEdge.weight < distances[subDestination - Const.A]) {
-                    distances[subDestination - Const.A] = subDistance + minEdge.weight;
-                    queue.add(new Edge(minEdge.destination, subDestination, subDistance + minEdge.weight));
+                if (!visited[subDestination - Const.A] && subDistance + minVertex.weight < distances[subDestination - Const.A]) {
+                    distances[subDestination - Const.A] = subDistance + minVertex.weight;
+                    queue.add(new Vertex(minVertex.destination, subDestination, subDistance + minVertex.weight));
 
-                    explores[subDestination - Const.A] = minEdge.destination - Const.A;
+                    explores[subDestination - Const.A] = minVertex.destination - Const.A;
                 }
             }
 
-            if (!isFirstVertex || !source.equals(minEdge.destination)) {
-                visited[minEdge.destination - Const.A] = true;
+            if (!isFirstEdge || !source.equals(minVertex.destination)) {
+                visited[minVertex.destination - Const.A] = true;
             }
-            isFirstVertex = false;
+            isFirstEdge = false;
         }
         List<Character> pathList = getPathInfoFromArray(explores, destination);
         if (Integer.MAX_VALUE != distances[destination - Const.A]) {
