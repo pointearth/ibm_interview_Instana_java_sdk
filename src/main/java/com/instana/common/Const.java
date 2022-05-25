@@ -1,4 +1,4 @@
-package instana;
+package com.instana.common;
 
 /**
  * @author Simon

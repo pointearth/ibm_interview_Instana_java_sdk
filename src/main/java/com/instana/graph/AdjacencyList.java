@@ -1,4 +1,4 @@
-package instana;
+package com.instana.graph;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Map;
  * which is referenced by one of Digraph.node.
  * using map instead of list, it would be easier to ensure contains a special child node.
  */
-public class AdjacencyListNode {
+public class AdjacencyList {
     public Character name;
     /**
      * children means all destination nodes from the node which named as this.name
@@ -18,7 +18,7 @@ public class AdjacencyListNode {
      */
     public Map<Character, Integer> children;
 
-    public AdjacencyListNode(Character name) {
+    public AdjacencyList(Character name) {
         this.name = name;
         children = new HashMap<>();
     }
