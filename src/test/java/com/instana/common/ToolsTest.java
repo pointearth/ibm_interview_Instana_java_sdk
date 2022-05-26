@@ -2,10 +2,9 @@ package com.instana.common;
 
 import com.instana.graph.Edge;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import java.util.List;
-import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ToolsTest {
@@ -54,10 +53,8 @@ class ToolsTest {
         if (null == edge) {
             destination = null;
         } else {
-            destination = edge.destination;
+            destination = edge.to;
         }
         assertEquals(expectDestination, destination);
     }
-
-
 }

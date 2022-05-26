@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -86,17 +85,17 @@ public class Tools {
         Edge edge = new Edge();
         try {
             if (isValidNodeName(edgeInfo.substring(0, 1))) {
-                edge.previous = edgeInfo.charAt(0);
+                edge.from = edgeInfo.charAt(0);
             } else {
                 return null;
             }
             if (isValidNodeName(edgeInfo.substring(1, 2))) {
-                edge.destination = edgeInfo.charAt(1);
+                edge.to = edgeInfo.charAt(1);
             } else {
                 return null;
             }
             String weightStr = edgeInfo.substring(2, edgeInfo.length());
-            edge.weight = Integer.parseInt(weightStr);
+            edge.instance = Integer.parseInt(weightStr);
             return edge;
         } catch (Exception ex) {
             // log

@@ -40,19 +40,19 @@ public class Digraph implements IGraph {
     }
     @Override
     public void addEdge(Edge edge){
-        if (!nodes.containsKey(edge.previous)) {
-            nodes.put(edge.previous, new AdjacencyList(edge.previous));
+        if (!nodes.containsKey(edge.from)) {
+            nodes.put(edge.from, new AdjacencyList(edge.from));
         }
-        AdjacencyList curNode = nodes.get(edge.previous);
-        curNode.children.put(edge.destination, edge.weight);
+        AdjacencyList curNode = nodes.get(edge.from);
+        curNode.children.put(edge.to, edge.instance);
     }
 
     @Override
     public void removeEdge(Edge edge) {
-        if (nodes.containsKey(edge.previous)) {
-            nodes.get(edge.previous).children.remove(edge.destination);
-            if (0 == nodes.get(edge.previous).children.size()) {
-                nodes.remove(edge.previous);
+        if (nodes.containsKey(edge.from)) {
+            nodes.get(edge.from).children.remove(edge.to);
+            if (0 == nodes.get(edge.from).children.size()) {
+                nodes.remove(edge.from);
             }
         }
     }
@@ -177,85 +177,88 @@ public class Digraph implements IGraph {
         if (!nodes.containsKey(source) || !nodes.containsKey(destination)) {
             throw new NotFoundException("can't find the node in the graph");
         }
-        // distances array presents the distances from source to vertices
-        int[] distances = new int[nodes.size()];
-        for (int i = 0; i < distances.length; i++) {
-            distances[i] = Integer.MAX_VALUE;
-        }
-        // visited array presents whether the edge is visited
-        boolean[] visited = new boolean[nodes.size()];
-        for (int i = 0; i < visited.length; i++) {
-            visited[i] = false;
+
+        Vertex[] vertices = new Vertex[nodes.size()];
+        for (int i = 0; i < vertices.length; i++) {
+            vertices[i] = new Vertex(null
+                    ,(char) (i + Const.A)
+                    ,Integer.MAX_VALUE
+            );
         }
 
-        // for each vertex, save its previous vertex index(name), for SPT
-        int[] explores = new int[nodes.size()];
-        for (int i = 0; i < explores.length; i++) {
-            // -1 means the 'previous' is unknown yet
-            explores[i] = ErrorCode.NOT_EXIST.getValue();
-        }
-
-        PriorityQueue<Vertex> queue = new PriorityQueue<>(Comparator.comparingInt(a -> a.weight));
-        queue.add(new Vertex(null, source, 0));
+        PriorityQueue<Vertex> queue = new PriorityQueue<>(Comparator.comparingInt(v -> v.instance));
+        vertices[source- Const.A].instance = 0;
+        queue.add(vertices[source- Const.A]);
         boolean isFirstEdge = true;
         while (!queue.isEmpty()) {
             Vertex minVertex = queue.poll();
-            // ignore if it is already visited
-            if (visited[minVertex.destination - Const.A]) {
-                continue;
+            if (!isFirstEdge) {
+                minVertex.visited = true;
+                // means reach the destination, have to avoid source == destination && first node
+                if (minVertex.destination.equals(destination)) {
+                    vertices[destination - Const.A].previous = minVertex.previous;
+                    break;
+                }
+                isFirstEdge = false;
             }
-            // avoid source == destination
-            if (minVertex.destination.equals(destination) && visited[source - Const.A]) {
-                explores[destination - Const.A] = minVertex.source - Const.A;
-                break;
-            }
+
             // the trace doesn't exist
             if (!nodes.containsKey(minVertex.destination)) {
                 throw new GraphException("can't find destination in priority queue");
             }
-            AdjacencyList node = nodes.get(minVertex.destination);
+            AdjacencyList adjacencyList = nodes.get(minVertex.destination);
 
-            for (Map.Entry<Character, Integer> subEdge : node.children.entrySet()) {
+            for (Map.Entry<Character, Integer> subEdge : adjacencyList.children.entrySet()) {
                 Character subDestination = subEdge.getKey();
                 Integer subDistance = subEdge.getValue();
-                // update distances array
-                if (!visited[subDestination - Const.A] && subDistance + minVertex.weight < distances[subDestination - Const.A]) {
-                    distances[subDestination - Const.A] = subDistance + minVertex.weight;
-                    queue.add(new Vertex(minVertex.destination, subDestination, subDistance + minVertex.weight));
 
-                    explores[subDestination - Const.A] = minVertex.destination - Const.A;
+                // update distances array
+                Vertex curVertex = vertices[subDestination - Const.A];
+                if (curVertex.visited) {
+                    continue;
+                }
+                // update is required in TWO seniors:
+                //      1: new instance < current instance
+                //      2: current instance == 0 and current vertex is destination vertex
+                if ((subDistance + minVertex.instance < curVertex.instance) || (0 == curVertex.instance && destination.equals(curVertex.destination)) ) {
+                    curVertex.previous= minVertex.destination;
+                    curVertex.instance = subDistance + minVertex.instance;
+
+                    if (!queue.contains(curVertex)) {
+                        queue.add(curVertex);
+                    }
                 }
             }
+            // avoid senior source == destination && first node, if not, set the vertex as visited
+//            if (!isFirstEdge  && !source.equals(minVertex.destination)) {
 
-            if (!isFirstEdge || !source.equals(minVertex.destination)) {
-                visited[minVertex.destination - Const.A] = true;
-            }
-            isFirstEdge = false;
+//            isFirstEdge = false;
         }
-        List<Character> pathList = getPathInfoFromArray(explores, destination);
-        if (Integer.MAX_VALUE != distances[destination - Const.A]) {
-            Map.Entry<Integer,List<Character>> shortestPath = new AbstractMap.SimpleEntry<>(distances[destination - Const.A],pathList );
+        List<Character> pathList = getPathInfoFromArray(vertices, destination);
+        // means find the answer
+        if (Integer.MAX_VALUE != vertices[destination - Const.A].instance) {
+            Map.Entry<Integer,List<Character>> shortestPath = new AbstractMap.SimpleEntry<>(vertices[destination - Const.A].instance,pathList );
             return Optional.of(shortestPath);
         } else {
             return Optional.empty();
         }
     }
-    public List<Character> getPathInfoFromArray(int[] explores, Character destination) {
-        if (0 == explores.length) {
+    public List<Character> getPathInfoFromArray(Vertex[] vertexArray, Character destination) {
+        if (0 == vertexArray.length) {
             return new LinkedList<>();
         }
         List<Character> pathList = new LinkedList<>();
         pathList.add(destination);
-        int previousIndex = explores[destination - Const.A];
-        while (previousIndex != -1) {
-            pathList.add(0,(char) (previousIndex + Const.A));
+        Character previous = vertexArray[destination - Const.A].previous;
+        while (null != previous) {
+            pathList.add(0,previous);
 ////            String previousPath = String.format("%c-", (char) (previousIndex + Const.A));
 //            sb.insert(0, previousPath);
             // it is a loop, means reach the start node
-            if (previousIndex == destination - Const.A) {
+            if (destination.equals(previous)) {
                 break;
             }
-            previousIndex = explores[previousIndex];
+            previous = vertexArray[previous- Const.A].previous;
         }
         return pathList;
     }

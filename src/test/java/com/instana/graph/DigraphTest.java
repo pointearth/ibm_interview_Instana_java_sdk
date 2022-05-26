@@ -1,18 +1,13 @@
 package com.instana.graph;
 
-import com.instana.common.Const4Test;
-import com.instana.common.Tools;
 import com.instana.exception.GraphException;
 import com.instana.exception.NotFoundException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
-
 import java.util.*;
 import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -96,7 +91,6 @@ class DigraphTest {
     }
 
 
-    //    void dijkstraGetMinDistance(Character startNodeName, Character endNodeName, int expectMinDistance) {
     @ParameterizedTest
     @Order(4)
     @MethodSource("getShortestPathDataProvider")
@@ -104,8 +98,8 @@ class DigraphTest {
         Optional<Map.Entry<Integer, List<Character>>> result = iGraph.getShortestPath(startNodeName, endNodeName);
         result.ifPresentOrElse(
                 realResult -> {
-                    assertEquals(expectResult.getKey(), realResult.getKey());
                     assertEquals(expectResult.getValue(), realResult.getValue());
+                    assertEquals(expectResult.getKey(), realResult.getKey());
                     }, () -> {assertTrue(result.isEmpty());}
         );
     }
@@ -113,8 +107,8 @@ class DigraphTest {
     static Stream<Arguments> getShortestPathDataProvider() {
         return Stream.of(
                 Arguments.of('A', 'C',new AbstractMap.SimpleEntry<Integer, List>(9, Arrays.asList('A', 'B', 'C'))),
-                Arguments.of('B', 'B',new AbstractMap.SimpleEntry<Integer, List>(9, Arrays.asList('B', 'C', 'E', 'B')))
-//               Arguments.of('E', 'D', new AbstractMap.SimpleEntry<Integer, List>(15, Arrays.asList('E', 'B', 'C', 'D')))
+                Arguments.of('B', 'B',new AbstractMap.SimpleEntry<Integer, List>(9, Arrays.asList('B', 'C', 'E', 'B'))),
+                Arguments.of('E', 'D', new AbstractMap.SimpleEntry<Integer, List>(15, Arrays.asList('E', 'B', 'C', 'D')))
         );
     }
 

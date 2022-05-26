@@ -6,22 +6,22 @@ package com.instana.graph;
  * the class is used in dijkstra algorithm, in priority Queue, or temporary data.
  */
 public class Edge {
-    public Character previous;
-    public Character destination;
-    public int weight;
+    public Character from;
+    public Character to;
+    public int instance;
 
     public Edge() {
-        weight = Integer.MAX_VALUE;
+        instance = Integer.MAX_VALUE;
     }
 
-    public Edge(Character previous, Character destination, int weight) {
-        this.previous = previous;
-        this.destination = destination;
-        this.weight = weight;
+    public Edge(Character from, Character to, int instance) {
+        this.from = from;
+        this.to = to;
+        this.instance = instance;
     }
 
     @Override
     public String toString() {
-        return String.format("edge: %c%c%d", previous, destination, weight);
+        return String.format("edge: %c%c%d", from, to, instance);
     }
 }
