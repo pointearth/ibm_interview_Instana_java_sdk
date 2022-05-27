@@ -11,34 +11,13 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class DigraphTest {
+
+class IGraphTest {
     private static IGraph iGraph;
 
     @BeforeAll
     static void setUp() {
         iGraph = new Digraph();
-    }
-
-    @Test
-    @Order(1)
-    void addEdge() {
-        iGraph.addEdge(new Edge('A', 'B', 5));
-        assertEquals(1, iGraph.getNumOfVertices());
-        assertEquals(1, iGraph.getNumOfEdges());
-    }
-
-    @Test
-    @Order(2)
-    void removeEdge() {
-        iGraph.removeEdge(new Edge('A', 'B', 5));
-        assertEquals(0, iGraph.getNumOfVertices());
-        assertEquals(0, iGraph.getNumOfEdges());
-    }
-
-    @Test
-    @Order(3)
-    void loadData() {
         List<Edge> edgeList = new LinkedList<>();
         edgeList.add(new Edge('A', 'B', 5));
         edgeList.add(new Edge('B', 'C', 4));
@@ -50,12 +29,10 @@ class DigraphTest {
         edgeList.add(new Edge('E', 'B', 3));
         edgeList.add(new Edge('A', 'E', 7));
         iGraph.loadData(edgeList);
-        assertEquals(5, iGraph.getNumOfVertices());
-        assertEquals(9, iGraph.getNumOfEdges());
     }
 
+
     @ParameterizedTest
-    @Order(4)
     @MethodSource("getInstanceDataProvider")
     void getInstance(Character source, Character destination, Optional<Integer> expectLatency) throws NotFoundException {
         Optional<Integer> instance = iGraph.getInstance(source, destination);
@@ -75,24 +52,13 @@ class DigraphTest {
     }
 
     @Test
-    @Order(5)
     void getInstanceShouldThrowException() {
         Assertions.assertThrows(NotFoundException.class, () -> {
             iGraph.getInstance('Z', 'B');
         });
     }
 
-    @Test
-    void getTraceNumberInMaxHops() {
-    }
-
-    @Test
-    void getTraceNumberExactlyHops() {
-    }
-
-
     @ParameterizedTest
-    @Order(4)
     @MethodSource("getShortestPathDataProvider")
     void getShortestPath(Character startNodeName, Character endNodeName, Map.Entry<Integer,List<Character>> expectResult) throws NotFoundException, GraphException {
         Optional<Map.Entry<Integer, List<Character>>> result = iGraph.getShortestPath(startNodeName, endNodeName);
@@ -111,8 +77,19 @@ class DigraphTest {
                 Arguments.of('E', 'D', new AbstractMap.SimpleEntry<Integer, List>(15, Arrays.asList('E', 'B', 'C', 'D')))
         );
     }
+    @Test
+    void getPathNumInEdgeNum() throws NotFoundException, GraphException {
+        assertEquals(2, iGraph.getPathNumInEdgeNum('C', 'C', 3));
+    }
+    @Test
+    void getPathNumInEdgeNumShouldThrowNotFoundException() throws NotFoundException, GraphException {
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            iGraph.getPathNumInEdgeNum('Z', 'C', 3);
+        });
+    }
 
     @Test
-    void getPathInfoFromArray() {
+    void getPathNumEqualEdgeNum() throws NotFoundException, GraphException{
+        assertEquals(3, iGraph.getPathNumEqualEdgeNum('A', 'C', 4));
     }
 }

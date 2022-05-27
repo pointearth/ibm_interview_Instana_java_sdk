@@ -12,10 +12,6 @@ public class Digraph implements IGraph {
     private Tools tools;
     private Map<Character, AdjacencyList> nodes;
 
-    /***
-     * Construct Directed Graph with edges
-     * @param edgesInfo
-     */
     public Digraph() {
         tools = new Tools();
         cleanData();
@@ -25,11 +21,11 @@ public class Digraph implements IGraph {
         nodes = new HashMap<>();
     }
     @Override
-    public int getNumOfVertices(){
+    public int getAmountOfSourceNodes(){
         return nodes.size();
     }
     @Override
-    public int getNumOfEdges() {
+    public int getAmountOfEdges() {
         final Integer[] num = {0};
         nodes.values().forEach(
                 adjacencyList -> {
@@ -67,14 +63,6 @@ public class Digraph implements IGraph {
         });
     }
 
-    /***
-     *
-     * @param pathInfo: nodes in the trace, such as A-B-C
-     * @return
-     *  -2: pathInfo' format error
-     *  -1: no such trace
-     *  >=0: average Latencies
-     */
     @Override
     public Optional<Integer> getInstance(Character source, Character destination) throws NotFoundException {
         if (!nodes.containsKey(source)) {
@@ -88,88 +76,80 @@ public class Digraph implements IGraph {
             return Optional.of(wight);
         }
     }
-
-    /**
-     * get the number of traces from service startNodeName to service endNodeName with maxHops limitation
-     *
-     * @param starNodeName start service name
-     * @param endNodeName  end service name
-     * @param maxHops      limitation of max hops
-     * @return -2: format error
-     * 0<=: trace number
-     */
-    public int getTraceNumberInMaxHops(Character starNodeName, Character endNodeName, int maxHops) {
-        if (null == starNodeName || null == endNodeName) {
-            return ErrorCode.INPUT_ERROR.getValue();
+    @Override
+    public int getPathNumInEdgeNum(Character source, Character destination, int maxEdgeNum)
+        throws NotFoundException, GraphException {
+        if (!nodes.containsKey(source)) {
+            throw new NotFoundException(String.format("Can't find the %c", source));
         }
-        if (!nodes.containsKey(starNodeName)) {
-            return 0;
-        }
-        AdjacencyList startNode = nodes.get(starNodeName);
-        String path = starNodeName.toString();
-        int traceNumber = bFSGetTraceNumberWithHops(startNode, endNodeName, false, maxHops, path);
-        return traceNumber;
+        String path ="";
+        return getNumOfPathsWithLimitedEdges(source, destination,false, maxEdgeNum, path);
     }
-
-    /**
-     * get the number of traces from service startNodeName to service endNodeName equal the expected Hops
-     *
-     * @param starNodeName start service name
-     * @param endNodeName  end service name
-     * @param exactlyHops  expect number of hops
-     * @return
-     */
-    public int getTraceNumberExactlyHops(Character starNodeName, Character endNodeName, int exactlyHops) {
-        if (!nodes.containsKey(starNodeName)) {
-            return 0;
+    @Override
+    public int getPathNumEqualEdgeNum(Character source, Character destination, int exactlyEdges)
+            throws NotFoundException, GraphException {
+        if (!nodes.containsKey(source)) {
+            throw new NotFoundException(String.format("Can't find the %c", source));
         }
-        AdjacencyList startNode = nodes.get(starNodeName);
-        String path = starNodeName.toString();
-        int traceNumber = bFSGetTraceNumberWithHops(startNode, endNodeName, true, exactlyHops, path);
-        return traceNumber;
+        String path ="";
+        return getNumOfPathsWithLimitedEdges(source, destination,true, exactlyEdges, path);
     }
 
     /**
      * recursive BSF method to
      *
-     * @param startNode   start service
-     * @param endNodeName end service name
-     * @param restHops    rest number of hops
+     * @param source   source node name
+     * @param destination destination node name
+     * @param numOfEdges    rest number of hops
      * @param path        help to show path
      * @return number of trace
-     * @bExactlyHops is exactly hops, or maxHops
+     * @bExactlyHops is exactly hops, or max hops
      */
-    private int bFSGetTraceNumberWithHops(AdjacencyList startNode, Character endNodeName, boolean bExactlyHops, int restHops, String path) {
-        System.out.println("current path:" + path);
-        if (restHops < 1) {
-            System.out.println("---reach limitation: " + path);
+    private int getNumOfPathsWithLimitedEdges(Character source, Character destination, boolean isExactly, int numOfEdges, String path)
+        throws GraphException
+    {
+//        System.out.println("current path:" + path);
+        AdjacencyList startNode = nodes.get(source);
+        if ( null == startNode) {
+            throw new GraphException(String.format("starNodeName %c doesn't exist ", source));
+        }
+        if (numOfEdges < 1) {
+//            System.out.println("---reach limitation: " + path);
             return 0;
         }
-        int traceNumber = 0;
-        if (startNode.children.containsKey(endNodeName)) {
-            if ((bExactlyHops && restHops == 1) || !bExactlyHops) {
-                traceNumber = 1;
-                System.out.println("===success " + path + "-" + endNodeName);
+        int[] traceNumber = {0};
+        if (startNode.children.containsKey(destination)) {
+            if ((isExactly && numOfEdges == 1) || !isExactly) {
+                traceNumber[0] = 1;
+//                System.out.println("===success " + path + "-" + destination);
             }
         }
-        for (Character nodeName : startNode.children.keySet()) {
-            if (nodes.containsKey(nodeName)) {
-                AdjacencyList curStartNode = nodes.get(nodeName);
-                traceNumber += bFSGetTraceNumberWithHops(curStartNode, endNodeName, bExactlyHops, restHops - 1, path + "-" + nodeName);
-            }
-        }
-        return traceNumber;
+        startNode.children.keySet().forEach(
+                nodeName -> {
+                    int curNumOfEdges = 0;
+                    try {
+                        curNumOfEdges = getNumOfPathsWithLimitedEdges(nodeName, destination, isExactly, numOfEdges - 1, path + "-" + nodeName);
+                    } catch (GraphException e) {
+                        e.printStackTrace();
+                    }
+                    traceNumber[0] += curNumOfEdges;
+                }
+        );
+        return traceNumber[0];
     }
 
 
     /**
-     * Calculate the shortest path between 2 nodes in the graph with dijkstra algorithm
-     *
-     * @param source      - source node
-     * @param destination - destination node
-     * @return - the instance of the shortest path, return empty if there is no trace between source and destination
-     * @throws NotFoundException - source/destination node does not exist in the graph
-     * @throws GraphException    - Graphic calculation error
+     * Get the shortest path between source and destination, Implemented with Dijkstra's Algorithm
+     * @param source - source node name
+     * @param destination - destination node name
+     * @return the shortest path
+     * 1. Optional.empty() : there is no path between source node and destination node
+     * 2. not empty: Map.Entry<Integer, List<Character>> - description the shortest path, including:
+     *      @Integer - the instance of the path
+     *      @List<Character> - serious of nodes in the Path. i.e: ['A', 'B' 'C'] means the shortest path is composed of nodes 'A', 'B' 'C'.
+     * @throws NotFoundException - source node doesn't exist in the graph
+     * @throws GraphException - internal error in the Graph
      */
     @Override
     public Optional<Map.Entry<Integer,List<Character>>> getShortestPath(Character source, Character destination)
@@ -229,10 +209,6 @@ public class Digraph implements IGraph {
                     }
                 }
             }
-            // avoid senior source == destination && first node, if not, set the vertex as visited
-//            if (!isFirstEdge  && !source.equals(minVertex.destination)) {
-
-//            isFirstEdge = false;
         }
         List<Character> pathList = getPathInfoFromArray(vertices, destination);
         // means find the answer
@@ -243,7 +219,14 @@ public class Digraph implements IGraph {
             return Optional.empty();
         }
     }
-    public List<Character> getPathInfoFromArray(Vertex[] vertexArray, Character destination) {
+
+    /**
+     *
+     * @param vertexArray
+     * @param destination
+     * @return
+     */
+    private List<Character> getPathInfoFromArray(Vertex[] vertexArray, Character destination) {
         if (0 == vertexArray.length) {
             return new LinkedList<>();
         }
@@ -252,9 +235,6 @@ public class Digraph implements IGraph {
         Character previous = vertexArray[destination - Const.A].previous;
         while (null != previous) {
             pathList.add(0,previous);
-////            String previousPath = String.format("%c-", (char) (previousIndex + Const.A));
-//            sb.insert(0, previousPath);
-            // it is a loop, means reach the start node
             if (destination.equals(previous)) {
                 break;
             }

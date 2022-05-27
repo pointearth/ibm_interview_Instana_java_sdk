@@ -38,21 +38,66 @@ public class TraceService {
             return ErrorCode.INPUT_ERROR.getValue();
         }
         Character[] pathNodes = tools.parsePath(pathInfo);
-        final Integer[] totalLatency = {0};
+//        final Integer[] totalLatency = {0};
+        Integer totalLatency = 0;
         for (int i = 1; i < pathNodes.length; i++) {
             Character fromService = pathNodes[i - 1];
             Character toService = pathNodes[i];
             Optional<Integer> latency = iGraph.getInstance(fromService, toService);
-            latency.ifPresentOrElse(
-                    curLatency -> totalLatency[0] += curLatency, () -> {
-                        throw new TraceNotFoundException(String.format("Don't find trace from %c to %c",fromService, toService));
-                    });
+            if (Optional.empty().equals(latency)) {
+                throw new TraceNotFoundException(String.format("Don't find trace from %c to %c",fromService, toService));
+            } else {
+                totalLatency += latency.get();
+            }
+//            latency.ifPresentOrElse(
+//                    curLatency -> totalLatency[0] += curLatency, () -> {
+//                        try {
+//                            throw new TraceNotFoundException(String.format("Don't find trace from %c to %c",fromService, toService));
+//                        } catch (TraceNotFoundException e) {
+//                            e.printStackTrace();
+//                        }
+//                    });
         }
-        return totalLatency[0];
+        return totalLatency;
+    }
+
+
+    /**
+     *
+     * @param startNodeName - starNodeName start service name
+     * @param endNodeName - endNodeName  end service name
+     * @param maxHops - limitation of max hops
+     * @return the number of the trace
+     * @throws InputFormatException startNode doesn't exist
+     * @throws NotFoundException
+     * @throws GraphException
+     */
+    public int getTraceNumInHops(Character startNodeName, Character endNodeName, int maxHops)
+            throws InputFormatException, NotFoundException, GraphException {
+        if (!tools.isValidNodeName(startNodeName) ) {
+            throw new InputFormatException("starNodeName is invalid");
+        }
+        return iGraph.getPathNumInEdgeNum(startNodeName, endNodeName, maxHops);
+    }
+
+    /**
+     * get the number of traces from service startNodeName to service endNodeName equal the expected Hops
+     *
+     * @param starNodeName start service name
+     * @param endNodeName  end service name
+     * @param exactlyHops  expect number of hops
+     * @return
+     */
+    public int getTraceNumEqualHops(Character starNodeName, Character endNodeName, int exactlyHops)
+            throws InputFormatException, NotFoundException, GraphException{
+        if (!tools.isValidNodeName(starNodeName) ) {
+            throw new InputFormatException("starNodeName is invalid");
+        }
+        return iGraph.getPathNumEqualEdgeNum(starNodeName, endNodeName, exactlyHops);
     }
 
     public Integer getLenShortestTrace(Character fromService, Character toService)
-            throws InputFormatException, NotFoundException,GraphException {
+            throws InputFormatException, NotFoundException,GraphException,TraceNotFoundException {
         if (null == fromService || null == toService) {
             throw new InputFormatException(String.format("dijkstraGetMinDistance argument is null"
                     , new NullPointerException("source/destination is null")));
@@ -61,7 +106,11 @@ public class TraceService {
         final Integer[] length = {0};
         shortestPathInfo.ifPresentOrElse(
                  pathInfo -> length[0] = pathInfo.getKey(), () -> {
-                    throw new TraceNotFoundException(String.format("Don't find trace from %c to %c",fromService, toService));
+                    try {
+                        throw new TraceNotFoundException(String.format("Don't find trace from %c to %c",fromService, toService));
+                    } catch (TraceNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 });
         return length[0];
     }
