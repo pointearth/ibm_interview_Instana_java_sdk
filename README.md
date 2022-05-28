@@ -74,13 +74,13 @@ create some customized exceptions to present special cases.
 Tools.java implements some common functions, these functions are due to serialize/deserialize or read file. i.e: covert data between string and objects
 # 5. Algorithm
 ## 5.1 Graph
-![graph](https://user-images.githubusercontent.com/1859919/170845002-974aed41-bf33-4822-9acb-66407ffce3cf.jpg)
+![graph](https://user-images.githubusercontent.com/1859919/170845219-4d9291ae-7339-4184-8da1-528d1098939f.jpg)
 
 ## 5.2 Storage
 Adjacency List, generally Adjacency List is present as an array and collection of lists. but to search a node quickly, we don't use array and list, but:
 - Use **HashMaps<Character, AdjacencyList> to replace array
 - Use **Map<Character, Integer>** in adjacencyList, to replace list
-![AdjacencyList](https://user-images.githubusercontent.com/1859919/170845127-88da62b3-274b-449c-9148-ed9ed26fd5df.jpg)
+![AdjacencyList](https://user-images.githubusercontent.com/1859919/170845199-6d229753-6f38-4269-9aff-807faddcabd7.jpg)
 
 For more information about Adjacency List, to see: 
 - https://www.youtube.com/watch?v=eQA-m22wjTQ
