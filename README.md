@@ -73,16 +73,20 @@ create some customized exceptions to present special cases.
 ## 4.5 common
 Tools.java implements some common functions, these functions are due to serialize/deserialize or read file. i.e: covert data between string and objects
 # 5. Algorithm
-## 5.1 Storage
+## 5.1 Graph
+![graph](https://user-images.githubusercontent.com/1859919/170845002-974aed41-bf33-4822-9acb-66407ffce3cf.jpg)
+
+## 5.2 Storage
 Adjacency List, generally Adjacency List is present as an array and collection of lists. but to search a node quickly, we don't use array and list, but:
 - Use **HashMaps<Character, AdjacencyList> to replace array
 - Use **Map<Character, Integer>** in adjacencyList, to replace list
+![AdjacencyList](https://user-images.githubusercontent.com/1859919/170845127-88da62b3-274b-449c-9148-ed9ed26fd5df.jpg)
 For more information about Adjacency List, to see: 
 - https://www.youtube.com/watch?v=eQA-m22wjTQ
 - https://www.geeksforgeeks.org/graph-and-its-representations/
-## 5.2 Deep First Search
+## 5.3 Deep First Search
 For question 6 and 7, we solve it with DFS. For more information, to see: https://www.youtube.com/watch?v=7fujbpJ0LB4
-## 5.3 Dijkstra’s algorithm
+## 5.4 Dijkstra’s algorithm
 To find the shortest path between 2 nodes, we use Dijkstra’s algorithm. it based on:
 - priority queue
 - Breadth First Search https://www.youtube.com/watch?v=oDqjPvD54Ss
