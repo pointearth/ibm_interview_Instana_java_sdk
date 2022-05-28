@@ -1,5 +1,5 @@
 
-# 1. depencdencies:
+# 1. Depencdencies:
 - Java min 11
 - maven min 3.x
 # 2. How to run
