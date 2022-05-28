@@ -81,6 +81,7 @@ Adjacency List, generally Adjacency List is present as an array and collection o
 - Use **HashMaps<Character, AdjacencyList> to replace array
 - Use **Map<Character, Integer>** in adjacencyList, to replace list
 ![AdjacencyList](https://user-images.githubusercontent.com/1859919/170845127-88da62b3-274b-449c-9148-ed9ed26fd5df.jpg)
+
 For more information about Adjacency List, to see: 
 - https://www.youtube.com/watch?v=eQA-m22wjTQ
 - https://www.geeksforgeeks.org/graph-and-its-representations/
