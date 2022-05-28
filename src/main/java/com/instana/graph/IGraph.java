@@ -58,7 +58,7 @@ public interface IGraph {
      *      Optional.empty() - there is no path between source and destination
      * @throws NotFoundException - source doesn't exit in the graph
      */
-    Optional<Integer> getInstance(Character source, Character destination) throws NotFoundException;
+    Optional<Integer> getDirectInstance(Character source, Character destination) throws NotFoundException;
 
     /**
      * Get number of paths between source node and destination node, within special edges

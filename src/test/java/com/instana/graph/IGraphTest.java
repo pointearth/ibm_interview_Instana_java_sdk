@@ -33,14 +33,14 @@ class IGraphTest {
 
 
     @ParameterizedTest
-    @MethodSource("getInstanceDataProvider")
-    void getInstance(Character source, Character destination, Optional<Integer> expectLatency) throws NotFoundException {
-        Optional<Integer> instance = iGraph.getInstance(source, destination);
+    @MethodSource("getDirectInstanceDataProvider")
+    void getDirectInstance(Character source, Character destination, Optional<Integer> expectLatency) throws NotFoundException {
+        Optional<Integer> instance = iGraph.getDirectInstance(source, destination);
         instance.ifPresentOrElse(
                 realInstance -> assertEquals(expectLatency.get(), realInstance), () -> assertTrue(instance.isEmpty()));
     }
 
-    static Stream<Arguments> getInstanceDataProvider() {
+    static Stream<Arguments> getDirectInstanceDataProvider() {
         return Stream.of(
                 Arguments.of('A', 'B', Optional.of(5))
                 , Arguments.of('A', 'D', Optional.of(5))
@@ -54,7 +54,7 @@ class IGraphTest {
     @Test
     void getInstanceShouldThrowException() {
         Assertions.assertThrows(NotFoundException.class, () -> {
-            iGraph.getInstance('Z', 'B');
+            iGraph.getDirectInstance('Z', 'B');
         });
     }
 

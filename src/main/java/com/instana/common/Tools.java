@@ -1,7 +1,6 @@
 package com.instana.common;
 
 import com.instana.graph.Edge;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;

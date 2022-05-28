@@ -12,10 +12,6 @@ public class Vertex {
     public int instance;
     public boolean visited = false;
 
-    public Vertex() {
-        instance = Integer.MAX_VALUE;
-    }
-
     public Vertex(Character previous, Character destination, int instance) {
         this.previous = previous;
         this.destination = destination;

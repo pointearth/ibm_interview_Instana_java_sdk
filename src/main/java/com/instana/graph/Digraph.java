@@ -64,7 +64,7 @@ public class Digraph implements IGraph {
     }
 
     @Override
-    public Optional<Integer> getInstance(Character source, Character destination) throws NotFoundException {
+    public Optional<Integer> getDirectInstance(Character source, Character destination) throws NotFoundException {
         if (!nodes.containsKey(source)) {
             throw new NotFoundException("source does not exist");
         }

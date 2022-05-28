@@ -19,7 +19,7 @@ public class TraceService {
         iGraph = new Digraph();
     }
 
-    public void loadData(String fileName) throws InputFormatException,NullPointerException {
+    public List<Edge> loadData(String fileName) throws InputFormatException,NullPointerException {
         String verticesInfo;
         try {
             verticesInfo = tools.readFromInputStream(fileName);
@@ -31,9 +31,10 @@ public class TraceService {
             throw new InputFormatException("read input data error" );
         }
         iGraph.loadData(edgeList);
+        return edgeList;
     }
 
-    public Integer getAverageLatency(String pathInfo) throws NotFoundException, TraceNotFoundException {
+    public Integer getLatency(String pathInfo) throws NotFoundException, TraceNotFoundException {
         if (null == pathInfo) {
             return ErrorCode.INPUT_ERROR.getValue();
         }
@@ -43,7 +44,7 @@ public class TraceService {
         for (int i = 1; i < pathNodes.length; i++) {
             Character fromService = pathNodes[i - 1];
             Character toService = pathNodes[i];
-            Optional<Integer> latency = iGraph.getInstance(fromService, toService);
+            Optional<Integer> latency = iGraph.getDirectInstance(fromService, toService);
             if (Optional.empty().equals(latency)) {
                 throw new TraceNotFoundException(String.format("Don't find trace from %c to %c",fromService, toService));
             } else {
