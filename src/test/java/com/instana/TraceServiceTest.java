@@ -1,7 +1,6 @@
 package com.instana;
 
 import com.instana.common.Const4Test;
-import com.instana.common.Tools;
 import com.instana.exception.GraphException;
 import com.instana.exception.NotFoundException;
 import com.instana.graph.Digraph;
@@ -13,18 +12,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mockito.internal.util.reflection.FieldSetter;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -35,7 +27,6 @@ class TraceServiceTest {
     @BeforeAll
     static void setUp() throws NoSuchFieldException, NotFoundException, GraphException {
         traceService = new TraceService();
-
         mockGraph();
         FieldSetter.setField(traceService, traceService.getClass().getDeclaredField("iGraph"), iGraph);
     }

@@ -40,7 +40,7 @@ public class Digraph implements IGraph {
             nodes.put(edge.from, new AdjacencyList(edge.from));
         }
         AdjacencyList curNode = nodes.get(edge.from);
-        curNode.children.put(edge.to, edge.instance);
+        curNode.children.put(edge.to, edge.distance);
     }
 
     @Override
@@ -82,8 +82,7 @@ public class Digraph implements IGraph {
         if (!nodes.containsKey(source)) {
             throw new NotFoundException(String.format("Can't find the %c", source));
         }
-        String path ="";
-        return getNumOfPathsWithLimitedEdges(source, destination,false, maxEdgeNum, path);
+        return getNumOfPathsWithLimitedEdges(source, destination,false, maxEdgeNum);
     }
     @Override
     public int getPathNumEqualEdgeNum(Character source, Character destination, int exactlyEdges)
@@ -91,44 +90,38 @@ public class Digraph implements IGraph {
         if (!nodes.containsKey(source)) {
             throw new NotFoundException(String.format("Can't find the %c", source));
         }
-        String path ="";
-        return getNumOfPathsWithLimitedEdges(source, destination,true, exactlyEdges, path);
+        return getNumOfPathsWithLimitedEdges(source, destination,true, exactlyEdges);
     }
 
     /**
-     * recursive BSF method to
-     *
+     * recursive BSF method to cal
      * @param source   source node name
      * @param destination destination node name
      * @param numOfEdges    rest number of hops
-     * @param path        help to show path
      * @return number of trace
      * @bExactlyHops is exactly hops, or max hops
      */
-    private int getNumOfPathsWithLimitedEdges(Character source, Character destination, boolean isExactly, int numOfEdges, String path)
+    private int getNumOfPathsWithLimitedEdges(Character source, Character destination, boolean isExactly, int numOfEdges)
         throws GraphException
     {
-//        System.out.println("current path:" + path);
         AdjacencyList startNode = nodes.get(source);
         if ( null == startNode) {
             throw new GraphException(String.format("starNodeName %c doesn't exist ", source));
         }
         if (numOfEdges < 1) {
-//            System.out.println("---reach limitation: " + path);
             return 0;
         }
         int[] traceNumber = {0};
         if (startNode.children.containsKey(destination)) {
             if ((isExactly && numOfEdges == 1) || !isExactly) {
                 traceNumber[0] = 1;
-//                System.out.println("===success " + path + "-" + destination);
             }
         }
         startNode.children.keySet().forEach(
                 nodeName -> {
                     int curNumOfEdges = 0;
                     try {
-                        curNumOfEdges = getNumOfPathsWithLimitedEdges(nodeName, destination, isExactly, numOfEdges - 1, path + "-" + nodeName);
+                        curNumOfEdges = getNumOfPathsWithLimitedEdges(nodeName, destination, isExactly, numOfEdges - 1);
                     } catch (GraphException e) {
                         e.printStackTrace();
                     }
@@ -166,8 +159,8 @@ public class Digraph implements IGraph {
             );
         }
 
-        PriorityQueue<Vertex> queue = new PriorityQueue<>(Comparator.comparingInt(v -> v.instance));
-        vertices[source- Const.A].instance = 0;
+        PriorityQueue<Vertex> queue = new PriorityQueue<>(Comparator.comparingInt(v -> v.distance));
+        vertices[source- Const.A].distance = 0;
         queue.add(vertices[source- Const.A]);
         boolean isFirstEdge = true;
         while (!queue.isEmpty()) {
@@ -200,9 +193,9 @@ public class Digraph implements IGraph {
                 // update is required in TWO seniors:
                 //      1: new instance < current instance
                 //      2: current instance == 0 and current vertex is destination vertex
-                if ((subDistance + minVertex.instance < curVertex.instance) || (0 == curVertex.instance && destination.equals(curVertex.destination)) ) {
+                if ((subDistance + minVertex.distance < curVertex.distance) || (0 == curVertex.distance && destination.equals(curVertex.destination)) ) {
                     curVertex.previous= minVertex.destination;
-                    curVertex.instance = subDistance + minVertex.instance;
+                    curVertex.distance = subDistance + minVertex.distance;
 
                     if (!queue.contains(curVertex)) {
                         queue.add(curVertex);
@@ -212,8 +205,8 @@ public class Digraph implements IGraph {
         }
         List<Character> pathList = getPathInfoFromArray(vertices, destination);
         // means find the answer
-        if (Integer.MAX_VALUE != vertices[destination - Const.A].instance) {
-            Map.Entry<Integer,List<Character>> shortestPath = new AbstractMap.SimpleEntry<>(vertices[destination - Const.A].instance,pathList );
+        if (Integer.MAX_VALUE != vertices[destination - Const.A].distance) {
+            Map.Entry<Integer,List<Character>> shortestPath = new AbstractMap.SimpleEntry<>(vertices[destination - Const.A].distance,pathList );
             return Optional.of(shortestPath);
         } else {
             return Optional.empty();

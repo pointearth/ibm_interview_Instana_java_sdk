@@ -8,20 +8,20 @@ package com.instana.graph;
 public class Edge {
     public Character from;
     public Character to;
-    public int instance;
+    public int distance;
 
     public Edge() {
-        instance = Integer.MAX_VALUE;
+        distance = Integer.MAX_VALUE;
     }
 
-    public Edge(Character from, Character to, int instance) {
+    public Edge(Character from, Character to, int distance) {
         this.from = from;
         this.to = to;
-        this.instance = instance;
+        this.distance = distance;
     }
 
     @Override
     public String toString() {
-        return String.format("edge: %c%c%d", from, to, instance);
+        return String.format("edge: %c%c%d", from, to, distance);
     }
 }

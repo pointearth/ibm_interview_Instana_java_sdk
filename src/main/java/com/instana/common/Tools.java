@@ -89,7 +89,7 @@ public class Tools {
                 return null;
             }
             String weightStr = edgeInfo.substring(2, edgeInfo.length());
-            edge.instance = Integer.parseInt(weightStr);
+            edge.distance = Integer.parseInt(weightStr);
             return edge;
         } catch (Exception ex) {
             // log

@@ -13,9 +13,10 @@ public class InstanaApplication {
         if (args.length < 1) {
             throw new InputFormatException("Please type the data file name");
         }
+        int argLength = args.length;
         String[] paths = new String[]{"A-B-C", "A-D","A-D-C","A-E-B-C-D","A-E-D"};
         TraceService traceService = new TraceService();
-        traceService.loadData(args[0]);
+        traceService.loadData(args[argLength-1]);
         for (int i = 0; i < paths.length; i++) {
             try {
                 Integer latency = traceService.getLatency(paths[i]);
