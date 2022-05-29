@@ -39,7 +39,6 @@ public class TraceService {
             return ErrorCode.INPUT_ERROR.getValue();
         }
         Character[] pathNodes = tools.parsePath(pathInfo);
-//        final Integer[] totalLatency = {0};
         Integer totalLatency = 0;
         for (int i = 1; i < pathNodes.length; i++) {
             Character fromService = pathNodes[i - 1];
@@ -50,14 +49,6 @@ public class TraceService {
             } else {
                 totalLatency += latency.get();
             }
-//            latency.ifPresentOrElse(
-//                    curLatency -> totalLatency[0] += curLatency, () -> {
-//                        try {
-//                            throw new TraceNotFoundException(String.format("Don't find trace from %c to %c",fromService, toService));
-//                        } catch (TraceNotFoundException e) {
-//                            e.printStackTrace();
-//                        }
-//                    });
         }
         return totalLatency;
     }
@@ -104,15 +95,11 @@ public class TraceService {
                     , new NullPointerException("source/destination is null")));
         }
         Optional<Map.Entry<Integer,List<Character>>> shortestPathInfo =  iGraph.getShortestPath(fromService, toService);
-        final Integer[] length = {0};
-        shortestPathInfo.ifPresentOrElse(
-                 pathInfo -> length[0] = pathInfo.getKey(), () -> {
-                    try {
-                        throw new TraceNotFoundException(String.format("Don't find trace from %c to %c",fromService, toService));
-                    } catch (TraceNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                });
-        return length[0];
+        Integer length = 0;
+        if (shortestPathInfo.isEmpty() || null == shortestPathInfo.get().getKey()) {
+            throw new TraceNotFoundException(String.format("Don't find trace from %c to %c",fromService, toService));
+        } else{
+            return shortestPathInfo.get().getKey();
+        }
     }
 }

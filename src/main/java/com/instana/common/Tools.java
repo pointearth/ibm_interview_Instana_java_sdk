@@ -92,7 +92,6 @@ public class Tools {
             edge.distance = Integer.parseInt(weightStr);
             return edge;
         } catch (Exception ex) {
-            // log
             return null;
         }
     }

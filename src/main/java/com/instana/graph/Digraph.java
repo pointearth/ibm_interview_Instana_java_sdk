@@ -54,7 +54,7 @@ public class Digraph implements IGraph {
     }
 
     @Override
-    public void loadData(List<Edge> edgeList) throws NullPointerException {
+    public void loadData(List<Edge> edgeList) {
         if (0 != nodes.size()) {
             cleanData();
         }
@@ -190,9 +190,11 @@ public class Digraph implements IGraph {
                 if (curVertex.visited) {
                     continue;
                 }
-                // update is required in TWO seniors:
-                //      1: new instance < current instance
-                //      2: current instance == 0 and current vertex is destination vertex
+                /**
+                 * update is required in TWO seniors:
+                 *    1: new instance < current instance
+                 *    2: current instance == 0 and current vertex is destination vertex
+                 */
                 if ((subDistance + minVertex.distance < curVertex.distance) || (0 == curVertex.distance && destination.equals(curVertex.destination)) ) {
                     curVertex.previous= minVertex.destination;
                     curVertex.distance = subDistance + minVertex.distance;

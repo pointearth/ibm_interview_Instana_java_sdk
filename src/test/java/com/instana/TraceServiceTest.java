@@ -25,12 +25,12 @@ class TraceServiceTest {
     private static TraceService traceService;
     private static IGraph iGraph;
     @BeforeAll
-    static void setUp() throws NoSuchFieldException, NotFoundException, GraphException {
+    static void setUp() throws NoSuchFieldException {
         traceService = new TraceService();
         mockGraph();
         FieldSetter.setField(traceService, traceService.getClass().getDeclaredField("iGraph"), iGraph);
     }
-    private static void mockGraph() throws GraphException, NotFoundException {
+    private static void mockGraph() {
         iGraph = mock(Digraph.class);
 
         Stream<Arguments> mockedEdges = mockDataProvider();
@@ -43,8 +43,6 @@ class TraceServiceTest {
                     }
                 }
         );
-    //        when(iGraph.getPathNumInEdgeNum('C', 'C', any())).thenReturn(2);
-//        when(iGraph.getPathNumInEdgeNum('A', 'C', any())).thenReturn(3);
     }
     static Stream<Arguments> mockDataProvider() {
         return Stream.of(
@@ -76,7 +74,6 @@ class TraceServiceTest {
                 , Arguments.of("A-D", 5)
                 , Arguments.of("A-D-C", 13)
                 , Arguments.of("A-E-B-C-D",22)
-                /*, Arguments.of("A-E-D",  )*/
         );
     }
     @Test

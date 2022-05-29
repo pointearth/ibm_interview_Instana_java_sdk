@@ -15,9 +15,8 @@ public interface IGraph {
     /**
      * Load data to create the graph
      * @param edgeList -  Edges to be loaded into the graph
-     * @throws NullPointerException
      */
-    void loadData(List<Edge> edgeList) throws NullPointerException;
+    void loadData(List<Edge> edgeList);
 
     /**
      * Clean all the data in the Graph

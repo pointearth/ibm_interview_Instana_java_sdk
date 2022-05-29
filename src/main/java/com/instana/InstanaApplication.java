@@ -24,7 +24,7 @@ public class InstanaApplication {
             } catch (TraceNotFoundException ex) {
                 System.out.println(String.format("%d. %s",i+1,"NO SUCH TRACE"));
             } catch (NotFoundException notFoundException) {
-                System.out.println(notFoundException);
+                System.out.printf(notFoundException.toString());
             }
         }
         try {
