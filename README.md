@@ -86,7 +86,10 @@ For more information about Adjacency List, to see:
 - https://www.youtube.com/watch?v=eQA-m22wjTQ
 - https://www.geeksforgeeks.org/graph-and-its-representations/
 ## 5.3 Deep First Search
-For question 6 and 7, we solve it with DFS. For more information, to see: https://www.youtube.com/watch?v=7fujbpJ0LB4
+- For question 6, 7 and 10 we solve it with DFS.
+- For question 10, even if it is a cycle graph, because there is a distance limitation, that means the search will be completed sooner or later, so the cycle graph equal a non-cycle graph
+<br>For more information about DFS, to see: https://www.youtube.com/watch?v=7fujbpJ0LB4
+
 ## 5.4 Dijkstra’s algorithm
 To find the shortest path between 2 nodes, we use Dijkstra’s algorithm. it based on:
 - priority queue
