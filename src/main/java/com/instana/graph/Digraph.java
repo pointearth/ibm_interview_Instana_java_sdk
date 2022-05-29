@@ -2,28 +2,29 @@ package com.instana.graph;
 
 import com.instana.exception.*;
 import com.instana.common.Const;
-import com.instana.common.Tools;
+
 import java.util.*;
 
 /**
  * @author Simon
  */
 public class Digraph implements IGraph {
-    private Tools tools;
     private Map<Character, AdjacencyList> nodes;
 
     public Digraph() {
-        tools = new Tools();
         cleanData();
     }
+
     @Override
     public void cleanData() {
         nodes = new HashMap<>();
     }
+
     @Override
-    public int getAmountOfSourceNodes(){
+    public int getAmountOfSourceNodes() {
         return nodes.size();
     }
+
     @Override
     public int getAmountOfEdges() {
         final Integer[] num = {0};
@@ -34,8 +35,9 @@ public class Digraph implements IGraph {
         );
         return num[0];
     }
+
     @Override
-    public void addEdge(Edge edge){
+    public void addEdge(Edge edge) {
         if (!nodes.containsKey(edge.from)) {
             nodes.put(edge.from, new AdjacencyList(edge.from));
         }
@@ -76,36 +78,38 @@ public class Digraph implements IGraph {
             return Optional.of(wight);
         }
     }
+
     @Override
     public int getPathNumInEdgeNum(Character source, Character destination, int maxEdgeNum)
-        throws NotFoundException, GraphException {
+            throws NotFoundException, GraphException {
         if (!nodes.containsKey(source)) {
             throw new NotFoundException(String.format("Can't find the %c", source));
         }
-        return getNumOfPathsWithLimitedEdges(source, destination,false, maxEdgeNum);
+        return getNumOfPathsWithLimitedEdges(source, destination, false, maxEdgeNum);
     }
+
     @Override
     public int getPathNumEqualEdgeNum(Character source, Character destination, int exactlyEdges)
             throws NotFoundException, GraphException {
         if (!nodes.containsKey(source)) {
             throw new NotFoundException(String.format("Can't find the %c", source));
         }
-        return getNumOfPathsWithLimitedEdges(source, destination,true, exactlyEdges);
+        return getNumOfPathsWithLimitedEdges(source, destination, true, exactlyEdges);
     }
 
     /**
      * recursive BSF method to cal
-     * @param source   source node name
+     *
+     * @param source      source node name
      * @param destination destination node name
-     * @param numOfEdges    rest number of hops
+     * @param numOfEdges  rest number of hops
      * @return number of trace
-     * @bExactlyHops is exactly hops, or max hops
+     * @isExactly is exactly hops, or max hops
      */
     private int getNumOfPathsWithLimitedEdges(Character source, Character destination, boolean isExactly, int numOfEdges)
-        throws GraphException
-    {
+            throws GraphException {
         AdjacencyList startNode = nodes.get(source);
-        if ( null == startNode) {
+        if (null == startNode) {
             throw new GraphException(String.format("starNodeName %c doesn't exist ", source));
         }
         if (numOfEdges < 1) {
@@ -113,7 +117,7 @@ public class Digraph implements IGraph {
         }
         int[] traceNumber = {0};
         if (startNode.children.containsKey(destination)) {
-            if ((isExactly && numOfEdges == 1) || !isExactly) {
+            if (!isExactly || 1 == numOfEdges) {
                 traceNumber[0] = 1;
             }
         }
@@ -134,18 +138,19 @@ public class Digraph implements IGraph {
 
     /**
      * Get the shortest path between source and destination, Implemented with Dijkstra's Algorithm
-     * @param source - source node name
+     *
+     * @param source      - source node name
      * @param destination - destination node name
      * @return the shortest path
      * 1. Optional.empty() : there is no path between source node and destination node
      * 2. not empty: Map.Entry<Integer, List<Character>> - description the shortest path, including:
-     *      @Integer - the instance of the path
-     *      @List<Character> - serious of nodes in the Path. i.e: ['A', 'B' 'C'] means the shortest path is composed of nodes 'A', 'B' 'C'.
      * @throws NotFoundException - source node doesn't exist in the graph
-     * @throws GraphException - internal error in the Graph
+     * @throws GraphException    - internal error in the Graph
+     * @Integer - the instance of the path
+     * @List<Character> - serious of nodes in the Path. i.e: ['A', 'B' 'C'] means the shortest path is composed of nodes 'A', 'B' 'C'.
      */
     @Override
-    public Optional<Map.Entry<Integer,List<Character>>> getShortestPath(Character source, Character destination)
+    public Optional<Map.Entry<Integer, List<Character>>> getShortestPath(Character source, Character destination)
             throws NotFoundException, GraphException {
         if (!nodes.containsKey(source) || !nodes.containsKey(destination)) {
             throw new NotFoundException("can't find the node in the graph");
@@ -154,14 +159,14 @@ public class Digraph implements IGraph {
         Vertex[] vertices = new Vertex[nodes.size()];
         for (int i = 0; i < vertices.length; i++) {
             vertices[i] = new Vertex(null
-                    ,(char) (i + Const.A)
-                    ,Integer.MAX_VALUE
+                    , (char) (i + Const.A)
+                    , Integer.MAX_VALUE
             );
         }
 
         PriorityQueue<Vertex> queue = new PriorityQueue<>(Comparator.comparingInt(v -> v.distance));
-        vertices[source- Const.A].distance = 0;
-        queue.add(vertices[source- Const.A]);
+        vertices[source - Const.A].distance = 0;
+        queue.add(vertices[source - Const.A]);
         boolean isFirstEdge = true;
         while (!queue.isEmpty()) {
             Vertex minVertex = queue.poll();
@@ -195,8 +200,10 @@ public class Digraph implements IGraph {
                  *    1: new instance < current instance
                  *    2: current instance == 0 and current vertex is destination vertex
                  */
-                if ((subDistance + minVertex.distance < curVertex.distance) || (0 == curVertex.distance && destination.equals(curVertex.destination)) ) {
-                    curVertex.previous= minVertex.destination;
+                //if ((subDistance + minVertex.distance < curVertex.distance) || (0 == curVertex.distance && destination.equals(curVertex.destination)) ) {
+                if ((subDistance + minVertex.distance < curVertex.distance)
+                        || (0 == curVertex.distance && destination.equals(curVertex.destination))) {
+                    curVertex.previous = minVertex.destination;
                     curVertex.distance = subDistance + minVertex.distance;
 
                     if (!queue.contains(curVertex)) {
@@ -208,7 +215,7 @@ public class Digraph implements IGraph {
         List<Character> pathList = getPathInfoFromArray(vertices, destination);
         // means find the answer
         if (Integer.MAX_VALUE != vertices[destination - Const.A].distance) {
-            Map.Entry<Integer,List<Character>> shortestPath = new AbstractMap.SimpleEntry<>(vertices[destination - Const.A].distance,pathList );
+            Map.Entry<Integer, List<Character>> shortestPath = new AbstractMap.SimpleEntry<>(vertices[destination - Const.A].distance, pathList);
             return Optional.of(shortestPath);
         } else {
             return Optional.empty();
@@ -216,7 +223,6 @@ public class Digraph implements IGraph {
     }
 
     /**
-     *
      * @param vertexArray
      * @param destination
      * @return
@@ -229,11 +235,11 @@ public class Digraph implements IGraph {
         pathList.add(destination);
         Character previous = vertexArray[destination - Const.A].previous;
         while (null != previous) {
-            pathList.add(0,previous);
+            pathList.add(0, previous);
             if (destination.equals(previous)) {
                 break;
             }
-            previous = vertexArray[previous- Const.A].previous;
+            previous = vertexArray[previous - Const.A].previous;
         }
         return pathList;
     }

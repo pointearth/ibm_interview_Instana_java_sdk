@@ -5,11 +5,17 @@ import com.instana.exception.*;
 import com.instana.graph.Digraph;
 import com.instana.graph.IGraph;
 import com.instana.graph.Edge;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Service layer
+ *
+ * @author Simon
+ */
 public class TraceService {
     private Tools tools;
     private IGraph iGraph;
@@ -19,16 +25,16 @@ public class TraceService {
         iGraph = new Digraph();
     }
 
-    public List<Edge> loadData(String fileName) throws InputFormatException,NullPointerException {
+    public List<Edge> loadData(String fileName) throws InputFormatException, NullPointerException {
         String verticesInfo;
         try {
             verticesInfo = tools.readFromInputStream(fileName);
         } catch (IOException ex) {
-            throw new InputFormatException("read input data error", ex );
+            throw new InputFormatException("read input data error", ex);
         }
         List<Edge> edgeList = tools.parseInput(verticesInfo);
         if (null == edgeList) {
-            throw new InputFormatException("read input data error" );
+            throw new InputFormatException("read input data error");
         }
         iGraph.loadData(edgeList);
         return edgeList;
@@ -39,13 +45,13 @@ public class TraceService {
             return ErrorCode.INPUT_ERROR.getValue();
         }
         Character[] pathNodes = tools.parsePath(pathInfo);
-        Integer totalLatency = 0;
+        int totalLatency = 0;
         for (int i = 1; i < pathNodes.length; i++) {
             Character fromService = pathNodes[i - 1];
             Character toService = pathNodes[i];
             Optional<Integer> latency = iGraph.getDirectInstance(fromService, toService);
             if (Optional.empty().equals(latency)) {
-                throw new TraceNotFoundException(String.format("Don't find trace from %c to %c",fromService, toService));
+                throw new TraceNotFoundException(String.format("Don't find trace from %c to %c", fromService, toService));
             } else {
                 totalLatency += latency.get();
             }
@@ -55,10 +61,9 @@ public class TraceService {
 
 
     /**
-     *
      * @param startNodeName - starNodeName start service name
-     * @param endNodeName - endNodeName  end service name
-     * @param maxHops - limitation of max hops
+     * @param endNodeName   - endNodeName  end service name
+     * @param maxHops       - limitation of max hops
      * @return the number of the trace
      * @throws InputFormatException startNode doesn't exist
      * @throws NotFoundException
@@ -66,7 +71,7 @@ public class TraceService {
      */
     public int getTraceNumInHops(Character startNodeName, Character endNodeName, int maxHops)
             throws InputFormatException, NotFoundException, GraphException {
-        if (!tools.isValidNodeName(startNodeName) ) {
+        if (!tools.isValidNodeName(startNodeName)) {
             throw new InputFormatException("starNodeName is invalid");
         }
         return iGraph.getPathNumInEdgeNum(startNodeName, endNodeName, maxHops);
@@ -81,24 +86,23 @@ public class TraceService {
      * @return
      */
     public int getTraceNumEqualHops(Character starNodeName, Character endNodeName, int exactlyHops)
-            throws InputFormatException, NotFoundException, GraphException{
-        if (!tools.isValidNodeName(starNodeName) ) {
+            throws InputFormatException, NotFoundException, GraphException {
+        if (!tools.isValidNodeName(starNodeName)) {
             throw new InputFormatException("starNodeName is invalid");
         }
         return iGraph.getPathNumEqualEdgeNum(starNodeName, endNodeName, exactlyHops);
     }
 
     public Integer getLenShortestTrace(Character fromService, Character toService)
-            throws InputFormatException, NotFoundException,GraphException,TraceNotFoundException {
+            throws InputFormatException, NotFoundException, GraphException, TraceNotFoundException {
         if (null == fromService || null == toService) {
-            throw new InputFormatException(String.format("dijkstraGetMinDistance argument is null"
-                    , new NullPointerException("source/destination is null")));
+            throw new InputFormatException("dijkstraGetMinDistance argument is null"
+                    , new NullPointerException("source/destination is null"));
         }
-        Optional<Map.Entry<Integer,List<Character>>> shortestPathInfo =  iGraph.getShortestPath(fromService, toService);
-        Integer length = 0;
+        Optional<Map.Entry<Integer, List<Character>>> shortestPathInfo = iGraph.getShortestPath(fromService, toService);
         if (shortestPathInfo.isEmpty() || null == shortestPathInfo.get().getKey()) {
-            throw new TraceNotFoundException(String.format("Don't find trace from %c to %c",fromService, toService));
-        } else{
+            throw new TraceNotFoundException(String.format("Don't find trace from %c to %c", fromService, toService));
+        } else {
             return shortestPathInfo.get().getKey();
         }
     }

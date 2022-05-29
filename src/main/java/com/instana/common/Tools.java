@@ -1,6 +1,7 @@
 package com.instana.common;
 
 import com.instana.graph.Edge;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.List;
  * @author Simon
  */
 public class Tools {
+    private static final String SLASH = "/";
+
     /**
      * Parse pathInfo
      *
@@ -40,6 +43,7 @@ public class Tools {
 
     /**
      * Parse Input graph into an edge list
+     *
      * @param edgesInfo: input information to create the graph,
      *                   i.e: "AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"
      * @return a list presenting all the edges
@@ -50,12 +54,12 @@ public class Tools {
             return null;
         }
         String[] edges = edgesInfo.split(Const.INPUT_SEPARATOR);
-        if (null == edges || 0 == edges.length) {
+        if (0 == edges.length) {
             return null;
         }
         List<Edge> list = new ArrayList<>();
-        for (int i = 0; i < edges.length; i++) {
-            Edge edge = parseEdge(edges[i].trim());
+        for (String s : edges) {
+            Edge edge = parseEdge(s.trim());
             if (null != edge) {
                 list.add(edge);
             } else {
@@ -97,16 +101,19 @@ public class Tools {
     }
 
     public boolean isValidNodeName(Character nodeName) {
-        return  null != nodeName && Const.A <= nodeName && nodeName<= Const.Z;
+        return null != nodeName && Const.A <= nodeName && nodeName <= Const.Z;
     }
 
     public String readFromInputStream(String fileName) throws IOException {
         InputStream inputStream;
-        if (!fileName.contains("/")) {
+        if (!fileName.contains(SLASH)) {
             ClassLoader classLoader = getClass().getClassLoader();
             inputStream = classLoader.getResourceAsStream(fileName);
         } else {
-            inputStream =  new FileInputStream(fileName);
+            inputStream = new FileInputStream(fileName);
+        }
+        if (null == inputStream) {
+            throw new IOException("Can't find the file");
         }
 
         StringBuilder resultStringBuilder = new StringBuilder();
