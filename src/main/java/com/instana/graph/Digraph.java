@@ -144,16 +144,16 @@ public class Digraph implements IGraph {
      * @return the shortest path
      * 1. Optional.empty() : there is no path between source node and destination node
      * 2. not empty: Map.Entry<Integer, List<Character>> - description the shortest path, including:
+     *        @Integer - the instance of the path
+     *        @List<Character> - serious of nodes in the Path. i.e: ['A', 'B' 'C'] means the shortest path is composed of nodes 'A', 'B' 'C'.
      * @throws NotFoundException - source node doesn't exist in the graph
      * @throws GraphException    - internal error in the Graph
-     * @Integer - the instance of the path
-     * @List<Character> - serious of nodes in the Path. i.e: ['A', 'B' 'C'] means the shortest path is composed of nodes 'A', 'B' 'C'.
      */
     @Override
     public Optional<Map.Entry<Integer, List<Character>>> getShortestPath(Character source, Character destination)
             throws NotFoundException, GraphException {
-        if (!nodes.containsKey(source) || !nodes.containsKey(destination)) {
-            throw new NotFoundException("can't find the node in the graph");
+        if (!nodes.containsKey(source)) {
+            throw new NotFoundException("can't find the source node in the graph");
         }
 
         Vertex[] vertices = new Vertex[nodes.size()];
@@ -170,9 +170,10 @@ public class Digraph implements IGraph {
         boolean isFirstEdge = true;
         while (!queue.isEmpty()) {
             Vertex minVertex = queue.poll();
+            //
             if (!isFirstEdge) {
                 minVertex.visited = true;
-                // means reach the destination, have to avoid source == destination && first node
+                // means reach the destination, have to avoid source == destination && first edge
                 if (minVertex.destination.equals(destination)) {
                     vertices[destination - Const.A].previous = minVertex.previous;
                     break;
@@ -200,7 +201,6 @@ public class Digraph implements IGraph {
                  *    1: new instance < current instance
                  *    2: current instance == 0 and current vertex is destination vertex
                  */
-                //if ((subDistance + minVertex.distance < curVertex.distance) || (0 == curVertex.distance && destination.equals(curVertex.destination)) ) {
                 if ((subDistance + minVertex.distance < curVertex.distance)
                         || (0 == curVertex.distance && destination.equals(curVertex.destination))) {
                     curVertex.previous = minVertex.destination;
@@ -243,7 +243,4 @@ public class Digraph implements IGraph {
         }
         return pathList;
     }
-//    public List<List<Character>> getTraceNumberInLatency(Character source, Character destination ) {
-//
-//    }
 }

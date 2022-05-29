@@ -92,7 +92,7 @@ public class Tools {
             } else {
                 throw new IllegalArgumentException("edgeInfo format is wrong at part 2");
             }
-            String weightStr = edgeInfo.substring(2, edgeInfo.length());
+            String weightStr = edgeInfo.substring(2);
             edge.distance = Integer.parseInt(weightStr);
             return edge;
         } catch (Exception ex) {
