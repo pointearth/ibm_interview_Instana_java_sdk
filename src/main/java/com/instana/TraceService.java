@@ -25,24 +25,24 @@ public class TraceService {
         iGraph = new Digraph();
     }
 
-    public List<Edge> loadData(String fileName) throws InputFormatException, NullPointerException {
+    public List<Edge> loadData(String fileName) throws IllegalArgumentException, NullPointerException {
         String verticesInfo;
         try {
             verticesInfo = tools.readFromInputStream(fileName);
         } catch (IOException ex) {
-            throw new InputFormatException("read input data error", ex);
+            throw new IllegalArgumentException("read input data error", ex);
         }
         List<Edge> edgeList = tools.parseInput(verticesInfo);
         if (null == edgeList) {
-            throw new InputFormatException("read input data error");
+            throw new IllegalArgumentException("read input data error");
         }
         iGraph.loadData(edgeList);
         return edgeList;
     }
 
-    public Integer getLatency(String pathInfo) throws NotFoundException, TraceNotFoundException {
+    public Integer getLatency(String pathInfo) throws NotFoundException,IllegalArgumentException, TraceNotFoundException {
         if (null == pathInfo) {
-            return ErrorCode.INPUT_ERROR.getValue();
+            throw new IllegalArgumentException("pathInfo is null");
         }
         Character[] pathNodes = tools.parsePath(pathInfo);
         int totalLatency = 0;
@@ -70,9 +70,9 @@ public class TraceService {
      * @throws GraphException
      */
     public int getTraceNumInHops(Character startNodeName, Character endNodeName, int maxHops)
-            throws InputFormatException, NotFoundException, GraphException {
+            throws IllegalArgumentException, NotFoundException, GraphException {
         if (!tools.isValidNodeName(startNodeName)) {
-            throw new InputFormatException("starNodeName is invalid");
+            throw new IllegalArgumentException("starNodeName is invalid");
         }
         return iGraph.getPathNumInEdgeNum(startNodeName, endNodeName, maxHops);
     }
@@ -86,17 +86,17 @@ public class TraceService {
      * @return
      */
     public int getTraceNumEqualHops(Character starNodeName, Character endNodeName, int exactlyHops)
-            throws InputFormatException, NotFoundException, GraphException {
+            throws IllegalArgumentException, NotFoundException, GraphException {
         if (!tools.isValidNodeName(starNodeName)) {
-            throw new InputFormatException("starNodeName is invalid");
+            throw new IllegalArgumentException("starNodeName is invalid");
         }
         return iGraph.getPathNumEqualEdgeNum(starNodeName, endNodeName, exactlyHops);
     }
 
     public Integer getLenShortestTrace(Character fromService, Character toService)
-            throws InputFormatException, NotFoundException, GraphException, TraceNotFoundException {
+            throws IllegalArgumentException, NotFoundException, GraphException, TraceNotFoundException {
         if (null == fromService || null == toService) {
-            throw new InputFormatException("dijkstraGetMinDistance argument is null"
+            throw new IllegalArgumentException("dijkstraGetMinDistance argument is null"
                     , new NullPointerException("source/destination is null"));
         }
         Optional<Map.Entry<Integer, List<Character>>> shortestPathInfo = iGraph.getShortestPath(fromService, toService);

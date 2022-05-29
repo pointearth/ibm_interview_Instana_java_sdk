@@ -22,20 +22,20 @@ public class Tools {
      * i.e: ['A', 'B', 'C']
      * null : input error
      */
-    public Character[] parsePath(String pathInfo) {
-        if (null == pathInfo || pathInfo.isEmpty()) {
-            return null;
+    public Character[] parsePath(String pathInfo) throws IllegalArgumentException {
+        if (null == pathInfo || pathInfo.trim().isEmpty()) {
+           throw new IllegalArgumentException("pathInfo is null or empty");
         }
         String[] paths = pathInfo.split(Const.PATH_SEPARATOR);
-        if (null == paths || 0 == paths.length) {
-            return null;
+        if ( 0 == paths.length) {
+            throw new IllegalArgumentException("pathInfo format is wrong");
         }
         Character[] nodes = new Character[paths.length];
         for (int i = 0; i < paths.length; i++) {
             if (isValidNodeName(paths[i].trim().charAt(0))) {
                 nodes[i] = paths[i].trim().charAt(0);
             } else {
-                return null;
+                throw new IllegalArgumentException("pathInfo format is wrong");
             }
         }
         return nodes;
@@ -47,15 +47,15 @@ public class Tools {
      * @param edgesInfo: input information to create the graph,
      *                   i.e: "AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7"
      * @return a list presenting all the edges
-     * null: edgesInfo is wrong
+     * @throws IllegalArgumentException - edgesInfo is null/empty or in a wrong format
      */
-    public List<Edge> parseInput(String edgesInfo) {
-        if (null == edgesInfo || edgesInfo.isEmpty()) {
-            return null;
+    public List<Edge> parseInput(String edgesInfo) throws IllegalArgumentException{
+        if (null == edgesInfo || edgesInfo.trim().isEmpty()) {
+            throw new IllegalArgumentException("edgesInfo is null or empty");
         }
         String[] edges = edgesInfo.split(Const.INPUT_SEPARATOR);
         if (0 == edges.length) {
-            return null;
+            throw new IllegalArgumentException("pathInfo format is wrong");
         }
         List<Edge> list = new ArrayList<>();
         for (String s : edges) {
@@ -63,7 +63,7 @@ public class Tools {
             if (null != edge) {
                 list.add(edge);
             } else {
-                return null;
+                throw new IllegalArgumentException("edgesInfo format is wrong");
             }
         }
         return list;
@@ -74,29 +74,29 @@ public class Tools {
      *
      * @param edgeInfo: like "AD5"
      * @return a edge
-     * null: input error
+     * IllegalArgumentException - edgeInfo is null/empty or in a wrong format
      */
     public Edge parseEdge(String edgeInfo) {
-        if (null == edgeInfo || edgeInfo.length() < 3) {
-            return null;
+        if (null == edgeInfo || edgeInfo.trim().length() < 3) {
+            throw new IllegalArgumentException("edgeInfo is null or empty");
         }
         Edge edge = new Edge();
         try {
             if (isValidNodeName(edgeInfo.trim().charAt(0))) {
                 edge.from = edgeInfo.charAt(0);
             } else {
-                return null;
+                throw new IllegalArgumentException("edgeInfo format is wrong at part 1");
             }
             if (isValidNodeName(edgeInfo.trim().charAt(1))) {
                 edge.to = edgeInfo.trim().charAt(1);
             } else {
-                return null;
+                throw new IllegalArgumentException("edgeInfo format is wrong at part 2");
             }
             String weightStr = edgeInfo.substring(2, edgeInfo.length());
             edge.distance = Integer.parseInt(weightStr);
             return edge;
         } catch (Exception ex) {
-            return null;
+            throw new IllegalArgumentException("edgeInfo format is wrong",ex);
         }
     }
 

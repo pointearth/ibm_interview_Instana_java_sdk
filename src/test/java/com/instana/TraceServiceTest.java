@@ -32,7 +32,6 @@ class TraceServiceTest {
     }
     private static void mockGraph() {
         iGraph = mock(Digraph.class);
-
         Stream<Arguments> mockedEdges = mockDataProvider();
         mockedEdges.forEach(
                 curEdge -> {

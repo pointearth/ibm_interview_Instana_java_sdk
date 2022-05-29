@@ -1,7 +1,6 @@
 package com.instana;
 
 
-import com.instana.exception.InputFormatException;
 import com.instana.exception.NotFoundException;
 import com.instana.exception.TraceNotFoundException;
 
@@ -13,7 +12,7 @@ import com.instana.exception.TraceNotFoundException;
 public class InstanaApplication {
     public static void main(String[] args) {
         if (args.length < 1) {
-            throw new InputFormatException("Please type the data file name");
+            throw new IllegalArgumentException("Please type the data file name");
         }
         int argLength = args.length;
         String[] paths = new String[]{"A-B-C", "A-D", "A-D-C", "A-E-B-C-D", "A-E-D"};
