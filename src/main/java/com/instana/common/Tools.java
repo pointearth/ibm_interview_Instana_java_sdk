@@ -20,7 +20,7 @@ public class Tools {
      * @param pathInfo: presenting path, i.e:  "A-B-C"
      * @return: a Character array presenting nodes in the path
      * i.e: ['A', 'B', 'C']
-     * null : input error
+     * @throws IllegalArgumentException - pathInfo is null/empty or in a wrong format
      */
     public Character[] parsePath(String pathInfo) throws IllegalArgumentException {
         if (null == pathInfo || pathInfo.trim().isEmpty()) {
@@ -76,7 +76,7 @@ public class Tools {
      * @return a edge
      * IllegalArgumentException - edgeInfo is null/empty or in a wrong format
      */
-    public Edge parseEdge(String edgeInfo) {
+    public Edge parseEdge(String edgeInfo) throws IllegalArgumentException {
         if (null == edgeInfo || edgeInfo.trim().length() < 3) {
             throw new IllegalArgumentException("edgeInfo is null or empty");
         }
