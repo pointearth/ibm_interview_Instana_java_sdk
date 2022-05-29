@@ -6,8 +6,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+
 import java.util.*;
 import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -60,27 +62,31 @@ class IGraphTest {
 
     @ParameterizedTest
     @MethodSource("getShortestPathDataProvider")
-    void getShortestPath(Character startNodeName, Character endNodeName, Map.Entry<Integer,List<Character>> expectResult) throws NotFoundException, GraphException {
+    void getShortestPath(Character startNodeName, Character endNodeName, Map.Entry<Integer, List<Character>> expectResult) throws NotFoundException, GraphException {
         Optional<Map.Entry<Integer, List<Character>>> result = iGraph.getShortestPath(startNodeName, endNodeName);
         result.ifPresentOrElse(
                 realResult -> {
                     assertEquals(expectResult.getValue(), realResult.getValue());
                     assertEquals(expectResult.getKey(), realResult.getKey());
-                    }, () -> {assertTrue(result.isEmpty());}
+                }, () -> {
+                    assertTrue(result.isEmpty());
+                }
         );
     }
 
     static Stream<Arguments> getShortestPathDataProvider() {
         return Stream.of(
-                Arguments.of('A', 'C',new AbstractMap.SimpleEntry<Integer, List>(9, Arrays.asList('A', 'B', 'C'))),
-                Arguments.of('B', 'B',new AbstractMap.SimpleEntry<Integer, List>(9, Arrays.asList('B', 'C', 'E', 'B'))),
+                Arguments.of('A', 'C', new AbstractMap.SimpleEntry<Integer, List>(9, Arrays.asList('A', 'B', 'C'))),
+                Arguments.of('B', 'B', new AbstractMap.SimpleEntry<Integer, List>(9, Arrays.asList('B', 'C', 'E', 'B'))),
                 Arguments.of('E', 'D', new AbstractMap.SimpleEntry<Integer, List>(15, Arrays.asList('E', 'B', 'C', 'D')))
         );
     }
+
     @Test
     void getPathNumInEdgeNum() throws NotFoundException, GraphException {
         assertEquals(2, iGraph.getPathNumInEdgeNum('C', 'C', 3));
     }
+
     @Test
     void getPathNumInEdgeNumShouldThrowNotFoundException() throws NotFoundException, GraphException {
         Assertions.assertThrows(NotFoundException.class, () -> {
@@ -89,7 +95,19 @@ class IGraphTest {
     }
 
     @Test
-    void getPathNumEqualEdgeNum() throws NotFoundException, GraphException{
+    void getPathNumEqualEdgeNum() throws NotFoundException, GraphException {
         assertEquals(3, iGraph.getPathNumEqualEdgeNum('A', 'C', 4));
+    }
+
+    @Test
+    void getTraceNumInDistance() throws GraphException, NotFoundException {
+        assertEquals(7, iGraph.getTraceNumInDistance('C', 'C', 30));
+    }
+
+    @Test
+    void getTraceNumInDistanceShouldThrowNotFoundException() {
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            iGraph.getTraceNumInDistance('Z', 'C', 30);
+        });
     }
 }

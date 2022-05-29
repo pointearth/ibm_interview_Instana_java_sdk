@@ -144,10 +144,10 @@ public class Digraph implements IGraph {
      * @return the shortest path
      * 1. Optional.empty() : there is no path between source node and destination node
      * 2. not empty: Map.Entry<Integer, List<Character>> - description the shortest path, including:
-     *        @Integer - the instance of the path
-     *        @List<Character> - serious of nodes in the Path. i.e: ['A', 'B' 'C'] means the shortest path is composed of nodes 'A', 'B' 'C'.
      * @throws NotFoundException - source node doesn't exist in the graph
      * @throws GraphException    - internal error in the Graph
+     * @Integer - the instance of the path
+     * @List<Character> - serious of nodes in the Path. i.e: ['A', 'B' 'C'] means the shortest path is composed of nodes 'A', 'B' 'C'.
      */
     @Override
     public Optional<Map.Entry<Integer, List<Character>>> getShortestPath(Character source, Character destination)
@@ -242,5 +242,51 @@ public class Digraph implements IGraph {
             previous = vertexArray[previous - Const.A].previous;
         }
         return pathList;
+    }
+
+    /**
+     * Get trace number between source and destination with distance limitation, Implemented with DFS Algorithm
+     *
+     * @param source      - source node name
+     * @param destination - destination node name
+     * @param lessThanDistance - limitation of max distance
+     * @return trace number
+     * @throws NotFoundException - source node doesn't exist
+     * @throws GraphException    - internal error in the Graph
+     */
+    @Override
+    public int getTraceNumInDistance(Character source, Character destination, int lessThanDistance)
+            throws NotFoundException, GraphException {
+        if (!nodes.containsKey(source)) {
+            throw new NotFoundException("can't find the node in the graph");
+        }
+        return getTraceNumInDistanceInternal(source, destination, lessThanDistance - 1);
+    }
+
+    private int getTraceNumInDistanceInternal(Character source, Character finalDestination, int restDistance)
+            throws GraphException {
+        AdjacencyList startNode = nodes.get(source);
+        if (null == startNode) {
+            throw new GraphException(String.format("starNodeName %c doesn't exist ", source));
+        }
+        if (restDistance < 0) {
+            return 0;
+        }
+        int[] traceNumber = {0};
+        if (startNode.children.containsKey(finalDestination) && startNode.children.get(finalDestination) <= restDistance) {
+            traceNumber[0] = 1;
+        }
+        startNode.children.entrySet().forEach(
+                curDestination -> {
+                    int curNumOfEdges = 0;
+                    try {
+                        curNumOfEdges = getTraceNumInDistanceInternal(curDestination.getKey(), finalDestination, restDistance - curDestination.getValue());
+                    } catch (GraphException e) {
+                        e.printStackTrace();
+                    }
+                    traceNumber[0] += curNumOfEdges;
+                }
+        );
+        return traceNumber[0];
     }
 }

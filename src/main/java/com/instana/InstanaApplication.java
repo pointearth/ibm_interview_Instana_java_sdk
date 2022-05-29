@@ -52,5 +52,11 @@ public class InstanaApplication {
         } catch (Exception ex) {
             System.out.printf("%s\n", ex);
         }
+        try {
+            int traceNum = traceService.getTraceNumInDistance('C', 'C', 30);
+            System.out.printf("10. %d\n", traceNum);
+        } catch (Exception ex) {
+            System.out.printf("%s\n", ex);
+        }
     }
 }

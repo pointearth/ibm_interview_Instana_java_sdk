@@ -40,7 +40,7 @@ public class TraceService {
         return edgeList;
     }
 
-    public Integer getLatency(String pathInfo) throws NotFoundException,IllegalArgumentException, TraceNotFoundException {
+    public Integer getLatency(String pathInfo) throws NotFoundException, IllegalArgumentException, TraceNotFoundException {
         if (null == pathInfo) {
             throw new IllegalArgumentException("pathInfo is null");
         }
@@ -96,8 +96,8 @@ public class TraceService {
     public Integer getLenShortestTrace(Character fromService, Character toService)
             throws IllegalArgumentException, NotFoundException, GraphException, TraceNotFoundException {
         if (null == fromService || null == toService) {
-            throw new IllegalArgumentException("dijkstraGetMinDistance argument is null"
-                    , new NullPointerException("source/destination is null"));
+            throw new IllegalArgumentException("getLenShortestTrace argument is null"
+                    , new NullPointerException("fromService/toService is null"));
         }
         Optional<Map.Entry<Integer, List<Character>>> shortestPathInfo = iGraph.getShortestPath(fromService, toService);
         if (shortestPathInfo.isEmpty() || null == shortestPathInfo.get().getKey()) {
@@ -105,5 +105,13 @@ public class TraceService {
         } else {
             return shortestPathInfo.get().getKey();
         }
+    }
+
+    public int getTraceNumInDistance(Character fromService, Character toService, int lessThanDistance) throws GraphException, NotFoundException {
+        if (null == fromService || null == toService) {
+            throw new IllegalArgumentException("getTraceNumInDistance argument is null"
+                    , new NullPointerException("fromService/toService is null"));
+        }
+        return iGraph.getTraceNumInDistance(fromService, toService, lessThanDistance);
     }
 }

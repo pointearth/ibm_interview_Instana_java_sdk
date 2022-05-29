@@ -105,4 +105,16 @@ public interface IGraph {
      * @List<Character> - serious of nodes in the Path. i.e: ['A', 'B' 'C'] means the shortest path is composed of nodes 'A', 'B' 'C'.
      */
     Optional<Map.Entry<Integer, List<Character>>> getShortestPath(Character source, Character destination) throws NotFoundException, GraphException;
+
+    /**
+     * Get trace number between source and destination with distance limitation
+     * @param source - source node name
+     * @param destination - destination node name
+     * @param lessThanDistance - limitation of max distance
+     * @return trace number
+     * @throws NotFoundException - source node doesn't exist
+     * @throws GraphException - internal error in the Graph
+     */
+    int getTraceNumInDistance(Character source, Character destination,int lessThanDistance )
+            throws NotFoundException, GraphException;
 }
