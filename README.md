@@ -81,7 +81,7 @@ Adjacency List, generally Adjacency List is present as an array and collection o
 - Use **HashMaps<Character, AdjacencyList> to replace array in Digraph class
 - Use **Map<Character, Integer>** in adjacencyList, to replace list
 ![AdjacencyList](https://user-images.githubusercontent.com/1859919/170937192-ff2c1500-1004-4fcd-ac5c-08e94729f73e.jpg)
-explan: 
+<br>explan: 
 - From a Digraph object, you can find AdjacencyList which is descibe node 'A''s as from node.
 - From the AdjacencyList, AdjacencyList.children present all of the edeges from 'A', you can see they are AB5, AD5 and AE7
 
