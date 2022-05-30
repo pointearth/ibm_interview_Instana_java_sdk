@@ -82,7 +82,7 @@ Adjacency List, generally Adjacency List is present as an array and collection o
 - Use **Map<Character, Integer>** in adjacencyList, to replace list
 ![AdjacencyList](https://user-images.githubusercontent.com/1859919/170937192-ff2c1500-1004-4fcd-ac5c-08e94729f73e.jpg)
 <br>Explain with the first part:
-![AdjacencyList_one](https://user-images.githubusercontent.com/1859919/170941682-548089da-bbb4-4236-97f2-24869fe13fa4.jpg)
+<br>![AdjacencyList_one](https://user-images.githubusercontent.com/1859919/170941682-548089da-bbb4-4236-97f2-24869fe13fa4.jpg)
 
 - 1.From a Digraph object, you can find AdjacencyList which is describing node 'A''s as from node.
 - 2.From the AdjacencyList, AdjacencyList.children present all the edges from 'A', you can see they are AB5, AD5 and AE7
