@@ -51,7 +51,7 @@ public interface IGraph {
 
     /**
      * Remove an edge from the graph
-     *
+     * Important: when you remove an edge, nodes will never, ever removed
      * @param edge - the edge to be removed
      */
     void removeEdge(Edge edge);
@@ -99,10 +99,14 @@ public interface IGraph {
      * @return the shortest path
      * 1. Optional.empty() : there is no path between source node and destination node
      * 2. not empty: Map.Entry<Integer, List<Character>> - description the shortest path, including:
+     *      - @Integer - the instance of the path
+     *      - @List<Character> - serious of nodes in the Path. i.e: ['A', 'B' 'C'] means the shortest path is composed of nodes 'A', 'B' 'C'.
+     * 3. Important: Use Optional.empty() to EXPLICIT present no path.
+     *      * I don't present no-path with 0 as Map.Entry<Integer, List<Character>>.getKey(), because:
+     *       - Optional.empty() is easier to understand
+     *       - 0 do more like a protocol.
      * @throws NotFoundException - source node doesn't exist in the graph
      * @throws GraphException    - internal error in the Graph
-     * @Integer - the instance of the path
-     * @List<Character> - serious of nodes in the Path. i.e: ['A', 'B' 'C'] means the shortest path is composed of nodes 'A', 'B' 'C'.
      */
     Optional<Map.Entry<Integer, List<Character>>> getShortestPath(Character source, Character destination) throws NotFoundException, GraphException;
 

@@ -5,6 +5,7 @@ import com.instana.exception.NotFoundException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.*;
@@ -20,17 +21,7 @@ class IGraphTest {
     @BeforeAll
     static void setUp() {
         iGraph = new Digraph();
-        List<Edge> edgeList = new LinkedList<>();
-        edgeList.add(new Edge('A', 'B', 5));
-        edgeList.add(new Edge('B', 'C', 4));
-        edgeList.add(new Edge('C', 'D', 8));
-        edgeList.add(new Edge('D', 'C', 8));
-        edgeList.add(new Edge('D', 'E', 6));
-        edgeList.add(new Edge('A', 'D', 5));
-        edgeList.add(new Edge('C', 'E', 2));
-        edgeList.add(new Edge('E', 'B', 3));
-        edgeList.add(new Edge('A', 'E', 7));
-        iGraph.loadData(edgeList);
+        iGraph.loadData(TestDataProvider.createData());
     }
 
 
@@ -38,8 +29,7 @@ class IGraphTest {
     @MethodSource("getDirectInstanceDataProvider")
     void getDirectInstance(Character source, Character destination, Optional<Integer> expectLatency) throws NotFoundException {
         Optional<Integer> instance = iGraph.getDirectInstance(source, destination);
-        instance.ifPresentOrElse(
-                realInstance -> assertEquals(expectLatency.get(), realInstance), () -> assertTrue(instance.isEmpty()));
+        expectLatency.equals(instance);
     }
 
     static Stream<Arguments> getDirectInstanceDataProvider() {
@@ -49,14 +39,14 @@ class IGraphTest {
                 , Arguments.of('A', 'E', Optional.of(7))
                 , Arguments.of('E', 'A', Optional.empty())
                 , Arguments.of('A', 'C', Optional.empty())
-                , Arguments.of('A', 'Z', Optional.empty())
         );
     }
 
-    @Test
-    void getInstanceShouldThrowException() {
+    @ParameterizedTest
+    @CsvSource({"A,Z", "Z,B"})
+    void getInstanceShouldThrowException(Character source, Character destination) {
         Assertions.assertThrows(NotFoundException.class, () -> {
-            iGraph.getDirectInstance('Z', 'B');
+            iGraph.getDirectInstance(source, destination);
         });
     }
 
@@ -64,12 +54,11 @@ class IGraphTest {
     @MethodSource("getShortestPathDataProvider")
     void getShortestPath(Character startNodeName, Character endNodeName, Map.Entry<Integer, List<Character>> expectResult) throws NotFoundException, GraphException {
         Optional<Map.Entry<Integer, List<Character>>> result = iGraph.getShortestPath(startNodeName, endNodeName);
-        result.ifPresentOrElse(
+        assertNotEquals(Optional.empty(),result );
+        result.ifPresent(
                 realResult -> {
-                    assertEquals(expectResult.getValue(), realResult.getValue());
                     assertEquals(expectResult.getKey(), realResult.getKey());
-                }, () -> {
-                    assertTrue(result.isEmpty());
+                    assertEquals(expectResult.getValue(), realResult.getValue());
                 }
         );
     }
@@ -81,6 +70,20 @@ class IGraphTest {
                 Arguments.of('E', 'D', new AbstractMap.SimpleEntry<Integer, List>(15, Arrays.asList('E', 'B', 'C', 'D')))
         );
     }
+
+    /**
+     * Expect There is no-path from 'A' to 'C', because removed all edges whose destination node is 'C'
+     * @throws NotFoundException
+     * @throws GraphException
+     */
+    @Test
+    void getShortestPathExpectNoPath() throws NotFoundException, GraphException {
+        IGraph individualGraph = new Digraph();
+        individualGraph.loadData(TestDataProvider.createDataWithoutDestinationC());
+        Optional<Map.Entry<Integer, List<Character>>> result = individualGraph.getShortestPath('A', 'C');
+        assertEquals(Optional.empty(),result );
+    }
+
 
     @Test
     void getPathNumInEdgeNum() throws NotFoundException, GraphException {

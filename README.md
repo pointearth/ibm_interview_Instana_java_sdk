@@ -66,7 +66,6 @@ From implement view, we use a directed graph to implement all features. it doesn
 InstanaApplication.java presents the business logic in the main function
 ## 4.4 Exception
 create some customized exceptions to present special cases.
-- InputFormatException: means input is not correct
 - NotFoundException: means something is not exist. especially a node is not exist, i.e: in the project, if you input any node 'Z', or ' ', this exception appear.
 - GraphException: some exception when we calculate in the graph, by default, it shouldn't appear, it means graphic algorithm error when it threw
 - TraceNotFoundException: any exist in Service layer, means the property trace fit for the criteria doesn't exist. 
