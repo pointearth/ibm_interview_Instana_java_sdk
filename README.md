@@ -79,7 +79,7 @@ Tools.java implements some common functions, these functions are due to serializ
 Adjacency List, generally Adjacency List is present as an array and collection of lists. but to search a node quickly, we don't use array and list, but:
 - Use **HashMaps<Character, AdjacencyList> to replace array
 - Use **Map<Character, Integer>** in adjacencyList, to replace list
-![AdjacencyList](https://user-images.githubusercontent.com/1859919/170845199-6d229753-6f38-4269-9aff-807faddcabd7.jpg)
+![AdjacencyList](https://user-images.githubusercontent.com/1859919/170937192-ff2c1500-1004-4fcd-ac5c-08e94729f73e.jpg)
 
 For more information about Adjacency List, to see: 
 - https://www.youtube.com/watch?v=eQA-m22wjTQ
