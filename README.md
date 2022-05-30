@@ -54,7 +54,7 @@ From A point, to reach C point, across B, two vertices can present the solution:
 - Mode layer
 - Application layer
 - Exception
-- common
+- Common
 ## 4.1 Service layer
 From business logic review, presents stories around **tracing** and **service**.
 ## 4.2 Mode layer
@@ -81,9 +81,11 @@ Adjacency List, generally Adjacency List is present as an array and collection o
 - Use **HashMaps<Character, AdjacencyList> to replace array in Digraph class
 - Use **Map<Character, Integer>** in adjacencyList, to replace list
 ![AdjacencyList](https://user-images.githubusercontent.com/1859919/170937192-ff2c1500-1004-4fcd-ac5c-08e94729f73e.jpg)
-<br>explan: 
-- From a Digraph object, you can find AdjacencyList which is descibe node 'A''s as from node.
-- From the AdjacencyList, AdjacencyList.children present all of the edeges from 'A', you can see they are AB5, AD5 and AE7
+<br>Explain with the first part:
+- ![AdjacencyList_one](https://user-images.githubusercontent.com/1859919/170941682-548089da-bbb4-4236-97f2-24869fe13fa4.jpg)
+
+- 1.From a Digraph object, you can find AdjacencyList which is describing node 'A''s as from node.
+- 2.From the AdjacencyList, AdjacencyList.children present all the edges from 'A', you can see they are AB5, AD5 and AE7
 
 For more information about Adjacency List, to see: 
 - https://www.youtube.com/watch?v=eQA-m22wjTQ
