@@ -73,13 +73,17 @@ create some customized exceptions to present special cases.
 Tools.java implements some common functions, these functions are due to serialize/deserialize or read file. i.e: covert data between string and objects
 # 5. Algorithm
 ## 5.1 Graph
+AB5,BC4,CD8,DC8,DE6,AD5,CE2,EB3,AE7 is drawed as follow:
 ![graph](https://user-images.githubusercontent.com/1859919/170845219-4d9291ae-7339-4184-8da1-528d1098939f.jpg)
 
 ## 5.2 Storage
 Adjacency List, generally Adjacency List is present as an array and collection of lists. but to search a node quickly, we don't use array and list, but:
-- Use **HashMaps<Character, AdjacencyList> to replace array
+- Use **HashMaps<Character, AdjacencyList> to replace array in Digraph class
 - Use **Map<Character, Integer>** in adjacencyList, to replace list
 ![AdjacencyList](https://user-images.githubusercontent.com/1859919/170937192-ff2c1500-1004-4fcd-ac5c-08e94729f73e.jpg)
+explan: 
+- From a Digraph object, you can find AdjacencyList which is descibe node 'A''s as from node.
+- From the AdjacencyList, AdjacencyList.children present all of the edeges from 'A', you can see they are AB5, AD5 and AE7
 
 For more information about Adjacency List, to see: 
 - https://www.youtube.com/watch?v=eQA-m22wjTQ
